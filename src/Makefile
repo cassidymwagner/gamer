@@ -188,7 +188,7 @@ SIMU_OPTION += -DOPENMP
 #SIMU_OPTION += -DLAOHU
 
 # support HDF5 format
-#SIMU_OPTION += -DSUPPORT_HDF5
+SIMU_OPTION += -DSUPPORT_HDF5
 
 # support GNU scientific library
 #SIMU_OPTION += -DSUPPORT_GSL
@@ -275,7 +275,7 @@ endif
 CUDA_PATH    :=
 FFTW_PATH    :=
 MPI_PATH     :=
-HDF5_PATH    :=
+HDF5_PATH    := /usr/include/
 GRACKLE_PATH :=
 GSL_PATH     :=
 
