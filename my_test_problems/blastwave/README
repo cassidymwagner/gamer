@@ -11,6 +11,16 @@ Default setup:
 2. Maximum refinement level (MAX_LEVEL) = 3
 
 
-Note:
+Create data file:
 ========================================
-1. Two plot scripts are attached: "plot_profile.gpt" and "plot_slice.py"
+Run convert_to_gamer_format.py to convert mhd256li* data into 
+format usable by GAMER, output as UM_IC
+
+Run simulation:
+========================================
+./gamer
+
+Data analysis:
+========================================
+Examples in test_plots.ipynb
+
