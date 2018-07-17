@@ -21,8 +21,7 @@ data["Pz"] = data["Density"] * data["Vz2"]
 #data["Pz"] = np.ones((256,256,256))
 
 data["V"] = np.sqrt(data["Vx2"]**2+data["Vy2"]**2+data["Vz2"]**2) 
-data["P"] = np.sqrt(data["Px"]**2+data["Py"]**2+data["Pz"]**2)
-#data["P"] = np.ones((256,256,256))
+data["P"] = np.ones((256,256,256))
 data["Energy"] = (
                   0.5 * data["Density"] * data["V"]**2 + 
                   data["P"]/(1.001 - 1)) 
