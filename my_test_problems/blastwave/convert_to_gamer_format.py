@@ -4,30 +4,19 @@ import numpy as np
 data = {}
 
 for field in ["Density", "Vx", "Vy", "Vz"]:
-    f = h5py.File("mhd256li_properIC.%s" % field)
-    data[field] = f["/mhd256li_properIC.%s" % field][:]
+    f = h5py.File("mhd512li.%s" % field)
+    data[field] = f["/mhd512li.%s" % field][:]
     f.close()
 
-data["Vx2"] = data["Vx"] * (data["Density"]**(-1/2))
-data["Vy2"] = data["Vy"] * (data["Density"]**(-1/2))
-data["Vz2"] = data["Vz"] * (data["Density"]**(-1/2))
+np.random.seed(0x4d3d3d3)
 
-data["Px"] = data["Density"] * data["Vx2"]
-data["Py"] = data["Density"] * data["Vy2"]
-data["Pz"] = data["Density"] * data["Vz2"]
-
-#data["Px"] = np.ones((256,256,256))
-#data["Py"] = np.ones((256,256,256))
-#data["Pz"] = np.ones((256,256,256))
-
-data["V"] = np.sqrt(data["Vx2"]**2+data["Vy2"]**2+data["Vz2"]**2) 
-data["P"] = np.ones((256,256,256))
-data["Energy"] = (
-                  0.5 * data["Density"] * data["V"]**2 + 
-                  data["P"]/(1.001 - 1)) 
-
-data["All"] = np.asarray((data["Density"],data["Pz"],data["Py"],data["Px"],data["Energy"]))
+data["Px"] = data["Density"] * data["Vx"]
+data["Py"] = data["Density"] * data["Vy"]
+data["Pz"] = data["Density"] * data["Vz"]
+data["Energy"] = np.random.random((512, 512, 512))
 
 with open("UM_IC", "wb") as f:
-        np.float32(data["All"].T).tofile(f)
+    for field in ["Density", "Px", "Py", "Pz", "Energy"]:
+        print("Writing %s" % field)
+        np.float32(data[field]).tofile(f)
 

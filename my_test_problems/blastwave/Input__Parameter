@@ -1,8 +1,6 @@
 
 
 # =================================================================================================================
-# Find on GitHub: https://github.com/cassidymwagner/gamer/
-
 # NOTE:
 # 1. Comment symbol: #
 # 2. [*]: defaults
@@ -19,8 +17,8 @@ BOX_SIZE                      1.0         # box size along the longest side (in 
 NX0_TOT_X                     256          # number of base-level cells along x
 NX0_TOT_Y                     256          # number of base-level cells along y
 NX0_TOT_Z                     256          # number of base-level cells along z
-OMP_NTHREAD                  -1           # number of OpenMP threads (<=0=auto -> omp_get_max_threads) [-1] ##OPENMP ONLY##
-END_T                        -1.0         # end physical time (<0=auto -> must be set by test problems or restart) [-1.0]
+OMP_NTHREAD                   32           # number of OpenMP threads (<=0=auto -> omp_get_max_threads) [-1] ##OPENMP ONLY##
+END_T                        0.25        # end physical time (<0=auto -> must be set by test problems or restart) [-1.0]
 END_STEP                     -1           # end step (<0=auto -> must be set by test problems or restart) [-1]
 
 
@@ -32,8 +30,8 @@ TESTPROB_ID                   1           # test problem ID [0]
 # code units (in cgs)
 OPT__UNIT                     0           # specify code units -> must set exactly 3 basic units below [0] ##USELESS FOR COMOVING##
 UNIT_L                        1.0         # length unit        (<=0 -> set to UNIT_V*UNIT_T or (UNIT_M/UNIT_D)^(1/3)) [1.0]
-UNIT_M                        1.0         # mass unit          (<=0 -> set to UNIT_D*UNIT_L^3)                        [1.0]
-UNIT_T                        1.0         # time unit          (<=0 -> set to UNIT_L/UNIT_V)                          [1.0]
+UNIT_M                       -1.0         # mass unit          (<=0 -> set to UNIT_D*UNIT_L^3)                        [1.0]
+UNIT_T                       -1.0         # time unit          (<=0 -> set to UNIT_L/UNIT_V)                          [1.0]
 UNIT_V                        1.0         # velocity unit      (<=0 -> set to UNIT_L/UNIT_T)                          [1.0]
 UNIT_D                        1.0         # mass density unit  (<=0 -> set to UNIT_M/UNIT_L^3)                        [1.0]
 
@@ -142,8 +140,8 @@ OPT__OUTPUT_PART              7           # output a single line or slice: (0=of
 OPT__OUTPUT_USER              0           # output the user-specified data -> edit "Output_User.cpp" [0]
 OPT__OUTPUT_BASEPS            0           # output the base-level power spectrum [0]
 OPT__OUTPUT_BASE              0           # only output the base-level data [0] ##OPT__OUTPUT_PART ONLY##
-OPT__OUTPUT_MODE              2           # (1=const step, 2=const dt, 3=dump table) -> edit "Input__DumpTable" for 3
-OUTPUT_STEP                   5           # output data every OUTPUT_STEP step ##OPT__OUTPUT_MODE==1 ONLY##
+OPT__OUTPUT_MODE              1           # (1=const step, 2=const dt, 3=dump table) -> edit "Input__DumpTable" for 3
+OUTPUT_STEP                   1           # output data every OUTPUT_STEP step ##OPT__OUTPUT_MODE==1 ONLY##
 OUTPUT_DT                     5.0e-4      # output data every OUTPUT_DT time interval ##OPT__OUTPUT_MODE==2 ONLY##
 OUTPUT_PART_X                 0.5         # x coordinate for OPT__OUTPUT_PART [-1.0]
 OUTPUT_PART_Y                 0.5         # y coordinate for OPT__OUTPUT_PART [-1.0]
