@@ -47,6 +47,7 @@ const TestProbID_t
    TESTPROB_HYDRO_PLUMMER                      =   11,
    TESTPROB_HYDRO_GRAVITY                      =   12,
 
+   TESTPROB_HYDRO_SGS                          =   900,
    TESTPROB_ELBDM_EXTPOT                       = 1000;
 
 
