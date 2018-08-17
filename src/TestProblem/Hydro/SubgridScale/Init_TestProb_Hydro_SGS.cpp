@@ -6,13 +6,9 @@
 // taken from Init_ExternalAcc.cpp
 // =====================================================================================================
 #include "CUPOT.h"
-double ExtAcc_AuxArray[EXT_ACC_NAUX_MAX];
 
-// declare as static so that other functions cannot invoke it directly and must use the function pointer
-static void Init_ExternalAcc();
+double *ExtAcc_InitialField[3]; 
 
-// this function pointer may be overwritten by various test problem initializers
-void (*Init_ExternalAcc_Ptr)() = Init_ExternalAcc;
 // ====================================================================================================
 
 
@@ -264,17 +260,19 @@ void Init_ExternalAcc()
 
   free(density);
 
-  const double M   = 1.0;
-  const double GM  = NEWTON_G*M;
-  const double Eps = 0.0;
+  for (int i = 0; i < 256*256*256; i++) {
+       ExtAcc_InitialField[0][i] = field_x[i];
+  }
 
-  ExtAcc_AuxArray[0] = field_x;
-  ExtAcc_AuxArray[1] = field_y;
-  ExtAcc_AuxArray[2] = field_z;
-  ExtAcc_AuxArray[3] = GM;
-  ExtAcc_AuxArray[4] = Eps;  
+  for (int i = 0; i < 256*256*256; i++) {
+       ExtAcc_InitialField[1][i] = field_y[i];
+  }
 
-  
+  for (int i = 0; i < 256*256*256; i++) {
+       ExtAcc_InitialField[2][i] = field_z[i];
+  }
+
+    
 } // FUNCTION : Init_ExternalAcc
 
 
@@ -318,7 +316,7 @@ void Init_TestProb_Hydro_SGS()
    Flu_ResetByUser_Func_Ptr = NULL;
    End_User_Ptr             = NULL;
 #  ifdef GRAVITY
-   Init_ExternalAcc_Ptr     = NULL;
+   Init_ExternalAcc_Ptr     = Init_ExternalAcc;
    Init_ExternalPot_Ptr     = NULL;
 #  endif
 #  endif // #if ( MODEL == HYDRO )
