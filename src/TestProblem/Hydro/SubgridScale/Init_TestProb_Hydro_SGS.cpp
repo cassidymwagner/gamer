@@ -3,16 +3,12 @@
 
 #ifdef GRAVITY
 
-// taken from Init_ExternalAcc.cpp
 // =====================================================================================================
 #include "CUPOT.h"
 
 double *ExtAcc_InitialField[3]; 
 
 // ====================================================================================================
-
-
-
 
 // problem-specific global variables
 // =======================================================================================
@@ -246,33 +242,41 @@ void Init_ExternalAcc()
   float *field_z = (float *) calloc(256*256*256, sizeof(float));
   nread = fread(field_z, sizeof(float), 256*256*256, bin_data);
 
-  for (int i = 0; i < 256*256*256; i++) {
-    field_x[i] /= density[i];
-    field_y[i] /= density[i];
-    field_z[i] /= density[i];
-  }
+  float *ix = (float *) calloc(256*256*256, sizeof(float));
+  float *iy = (float *) calloc(256*256*256, sizeof(float));
+  float *iz = (float *) calloc(256*256*256, sizeof(float));
 
-  fprintf(stderr, "Last row: %0.3g %0.3g %0.3g %0.3g\n",
-      density[256*256*256-1],
-      field_x[256*256*256-1],
-      field_y[256*256*256-1],
-      field_z[256*256*256-1]);
+  float *m_temp = (float *) calloc(256*256*256, sizeof(float));
+
+  *field_x /= *density;     // divided by density to get velocity
+  *field_y /= *density;
+  *field_z /= *density;
+  
+  for( int i = 0; i < 256; i++){
+
+    ix[i] = ((field_x[i] - field_x[i-1]) / (field_x[i+1] - field_x[i-1])) * 256;
+    iy[i] = ((field_y[i] - field_y[i-1]) / (field_y[i+1] - field_y[i-1])) * 256;
+    iz[i] = ((field_z[i] - field_z[i-1]) / (field_z[i+1] - field_z[i-1])) * 256;
+     
+    m_temp[i] = (iz[i] + 256 * (iy[i] + 256 * ix[i]));
+
+    int m[i] = { static_cast<int>(m_temp[i]) };
+    
+    *ExtAcc_InitialField[0] = static_cast<double>(field_x[m[i]]);
+    *ExtAcc_InitialField[1] = static_cast<double>(field_y[m[i]]);
+    *ExtAcc_InitialField[2] = static_cast<double>(field_z[m[i]]);
+
+  }
 
   free(density);
-
-  for (int i = 0; i < 256*256*256; i++) {
-       ExtAcc_InitialField[0][i] = field_x[i];
-  }
-
-  for (int i = 0; i < 256*256*256; i++) {
-       ExtAcc_InitialField[1][i] = field_y[i];
-  }
-
-  for (int i = 0; i < 256*256*256; i++) {
-       ExtAcc_InitialField[2][i] = field_z[i];
-  }
-
-    
+  free(ix);
+  free(iy);
+  free(iz);
+  free(m_temp);
+  free(field_x);
+  free(field_y);
+  free(field_z);
+  
 } // FUNCTION : Init_ExternalAcc
 
 
