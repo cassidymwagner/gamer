@@ -248,25 +248,18 @@ void Init_ExternalAcc()
 
   float *m_temp = (float *) calloc(256*256*256, sizeof(float));
 
-  *field_x /= *density;     // divided by density to get velocity
-  *field_y /= *density;
-  *field_z /= *density;
+  ExtAcc_InitialField[0] = (double*)calloc(256*256*256, sizeof(double));
+  ExtAcc_InitialField[1] = (double*)calloc(256*256*256, sizeof(double));
+  ExtAcc_InitialField[2] = (double*)calloc(256*256*256, sizeof(double));
+  
+  for( int i = 0; i < 256*256*256; i++){
 
-  for( int i = 0; i < 256; i++){
-
-    ix[i] = ((field_x[i] - field_x[i-1]) / (field_x[i+1] - field_x[i-1])) * 256;
-    iy[i] = ((field_y[i] - field_y[i-1]) / (field_y[i+1] - field_y[i-1])) * 256;
-    iz[i] = ((field_z[i] - field_z[i-1]) / (field_z[i+1] - field_z[i-1])) * 256;
-     
-    m_temp[i] = (iz[i] + 256 * (iy[i] + 256 * ix[i]));
-
-    int m[i] = { static_cast<int>(m_temp[i]) };
-    
-    *ExtAcc_InitialField[0] = static_cast<double>(field_x[m[i]]);
-    *ExtAcc_InitialField[1] = static_cast<double>(field_y[m[i]]);
-    *ExtAcc_InitialField[2] = static_cast<double>(field_z[m[i]]);
-
+    ExtAcc_InitialField[0][i] = 1e5 * field_x[i] / density[i];
+    ExtAcc_InitialField[1][i] = 1e5 * field_y[i] / density[i];
+    ExtAcc_InitialField[2][i] = 1e5 * field_z[i] / density[i];
   }
+
+
 
   free(density);
   free(ix);
