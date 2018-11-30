@@ -216,6 +216,7 @@ void Output_DumpData_Total_HDF5( const char *FileName )
 
 // 2-1. do NOT write fill values to any dataset for higher I/O performance
    H5_DataCreatePropList = H5Pcreate( H5P_DATASET_CREATE );
+   assert(H5_DataCreatePropList != -1);
    H5_Status             = H5Pset_fill_time( H5_DataCreatePropList, H5D_FILL_TIME_NEVER );
 
 // 2-2. create the "compound" datatype

@@ -251,7 +251,7 @@ void Init_ExternalAcc()
   *field_x /= *density;     // divided by density to get velocity
   *field_y /= *density;
   *field_z /= *density;
-  
+
   for( int i = 0; i < 256; i++){
 
     ix[i] = ((field_x[i] - field_x[i-1]) / (field_x[i+1] - field_x[i-1])) * 256;
