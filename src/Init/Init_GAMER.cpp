@@ -75,6 +75,7 @@ void Init_GAMER( int *argc, char ***argv )
    Init_FFTW();
 #  endif
 
+   assert(0);
 
 // initialize the test problem parameters
    Init_TestProb();

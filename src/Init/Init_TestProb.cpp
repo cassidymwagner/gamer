@@ -57,8 +57,8 @@ void Init_TestProb()
       case TESTPROB_HYDRO_PLUMMER :                      Init_TestProb_Hydro_Plummer();                     break;
       case TESTPROB_HYDRO_GRAVITY :                      Init_TestProb_Hydro_Gravity();                     break;
 
-      case TESTPROB_HYDRO_SGS :                          Init_TestProb_Hydro_SGS;
-break;
+      
+      case TESTPROB_HYDRO_SGS :                          fprintf(stderr, "HI\n"); Init_TestProb_Hydro_SGS();                           break;
       case TESTPROB_ELBDM_EXTPOT :                       Init_TestProb_ELBDM_ExtPot();                      break;
 
       default: Aux_Error( ERROR_INFO, "unsupported TESTPROB_ID (%d) !!\n", TESTPROB_ID );

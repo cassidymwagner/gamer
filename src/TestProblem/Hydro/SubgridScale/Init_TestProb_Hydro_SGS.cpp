@@ -245,7 +245,6 @@ void Init_ExternalAcc()
   float *m_temp = (float *) calloc(256*256*256, sizeof(float));
 
 
-  fprintf(stderr, "HEY!!!!\n");
   ExtAcc_InitialField[0] = (double*)calloc(256*256*256, sizeof(double));
   ExtAcc_InitialField[1] = (double*)calloc(256*256*256, sizeof(double));
   ExtAcc_InitialField[2] = (double*)calloc(256*256*256, sizeof(double));
@@ -286,6 +285,7 @@ void Init_TestProb_Hydro_SGS()
 
    if ( MPI_Rank == 0 )    Aux_Message( stdout, "%s ...\n", __FUNCTION__ );
 
+   assert(0);
 
 // validate the compilation flags and runtime parameters
    Validate();
