@@ -242,30 +242,23 @@ void Init_ExternalAcc()
   float *field_z = (float *) calloc(256*256*256, sizeof(float));
   nread = fread(field_z, sizeof(float), 256*256*256, bin_data);
 
-  float *ix = (float *) calloc(256*256*256, sizeof(float));
-  float *iy = (float *) calloc(256*256*256, sizeof(float));
-  float *iz = (float *) calloc(256*256*256, sizeof(float));
-
   float *m_temp = (float *) calloc(256*256*256, sizeof(float));
 
+
+  fprintf(stderr, "HEY!!!!\n");
   ExtAcc_InitialField[0] = (double*)calloc(256*256*256, sizeof(double));
   ExtAcc_InitialField[1] = (double*)calloc(256*256*256, sizeof(double));
   ExtAcc_InitialField[2] = (double*)calloc(256*256*256, sizeof(double));
   
   for( int i = 0; i < 256*256*256; i++){
 
-    ExtAcc_InitialField[0][i] = 1e5 * field_x[i] / density[i];
-    ExtAcc_InitialField[1][i] = 1e5 * field_y[i] / density[i];
-    ExtAcc_InitialField[2][i] = 1e5 * field_z[i] / density[i];
+    ExtAcc_InitialField[0][i] = field_x[i] / density[i];
+    ExtAcc_InitialField[1][i] = field_y[i] / density[i];
+    ExtAcc_InitialField[2][i] = field_z[i] / density[i];
   }
 
 
-
   free(density);
-  free(ix);
-  free(iy);
-  free(iz);
-  free(m_temp);
   free(field_x);
   free(field_y);
   free(field_z);

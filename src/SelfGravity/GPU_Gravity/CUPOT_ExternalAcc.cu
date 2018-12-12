@@ -7,10 +7,14 @@
 
 #ifdef GRAVITY
 
-
 // soften length implementation
-#  define SOFTEN_PLUMMER
+//#  define SOFTEN_PLUMMER
 //#  define SOFTEN_RUFFERT
+#   define DRIV_TURB
+
+#  if   (defined DRIV_TURB)
+extern double* ExtAcc_InitialField[3];
+#  endif
 
 
 
@@ -74,6 +78,29 @@ void   CPU_ExternalAcc( real Acc[], const double x, const double y, const double
    Acc[0] = -GM*_r3*dx;
    Acc[1] = -GM*_r3*dy;
    Acc[2] = -GM*_r3*dz;
+
+#  if   (defined DRIV_TURB)
+   int m_temp, ix, iy, iz;
+  
+   for (int i = 1; i < 256*256*256; i++){
+
+     ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * 256);
+     iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * 256);
+     iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * 256);
+
+     m_temp = (iz + 256 * (iy + 256 * ix));
+
+     //int m[i] = { static_cast<int>(m_temp[i]) };
+   
+     Acc[0] = ExtAcc_InitialField[0][m_temp];
+     Acc[1] = ExtAcc_InitialField[1][m_temp];
+     Acc[2] = ExtAcc_InitialField[2][m_temp];
+  
+   }
+   
+   //free( m );
+
+#  endif
 
 } // FUNCTION : CUPOT_ExternalAcc / CPU_ExternalAcc
 
