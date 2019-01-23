@@ -53,7 +53,6 @@ void CUPOT_ExternalAcc( real Acc[], const double x, const double y, const double
 void   CPU_ExternalAcc( real Acc[], const double x, const double y, const double z, const double Time, const double UserArray[] )
 #endif
 {
-
    const double Cen[3] = { UserArray[0], UserArray[1], UserArray[2] };
    const real GM       = (real)UserArray[3];
    const real eps      = (real)UserArray[4];
@@ -82,23 +81,20 @@ void   CPU_ExternalAcc( real Acc[], const double x, const double y, const double
 #  if   (defined DRIV_TURB)
    int m_temp, ix, iy, iz;
   
-   for (int i = 1; i < 256*256*256; i++){
+   ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * 256);
+   iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * 256);
+   iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * 256);
 
-     ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * 256);
-     iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * 256);
-     iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * 256);
+   m_temp = (iz + 256 * (iy + 256 * ix));
 
-     m_temp = (iz + 256 * (iy + 256 * ix));
-
-     //int m[i] = { static_cast<int>(m_temp[i]) };
-   
-     Acc[0] = ExtAcc_InitialField[0][m_temp];
-     Acc[1] = ExtAcc_InitialField[1][m_temp];
-     Acc[2] = ExtAcc_InitialField[2][m_temp];
+   Acc[0] = ExtAcc_InitialField[0][m_temp];
+   Acc[1] = ExtAcc_InitialField[1][m_temp];
+   Acc[2] = ExtAcc_InitialField[2][m_temp];
   
-   }
-   
    //free( m );
+   //if ((ix == iy) && (iy == iz) && (iz == 0)) 
+   // Aux_Message(stderr, "At %lf %lf %lf acc %lf %lf %lf\n",
+   //     x, y, z, Acc[0], Acc[1], Acc[2]);
 
 #  endif
 
