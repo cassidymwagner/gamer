@@ -242,9 +242,6 @@ void Init_ExternalAcc()
   float *field_z = (float *) calloc(256*256*256, sizeof(float));
   nread = fread(field_z, sizeof(float), 256*256*256, bin_data);
 
-  float *m_temp = (float *) calloc(256*256*256, sizeof(float));
-
-
   ExtAcc_InitialField[0] = (double*)calloc(256*256*256, sizeof(double));
   ExtAcc_InitialField[1] = (double*)calloc(256*256*256, sizeof(double));
   ExtAcc_InitialField[2] = (double*)calloc(256*256*256, sizeof(double));
