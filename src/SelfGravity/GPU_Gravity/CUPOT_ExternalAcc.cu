@@ -85,6 +85,17 @@ void   CPU_ExternalAcc( real Acc[], const double x, const double y, const double
    iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * 256);
    iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * 256);
 
+   if (ix < 0) ix += 256;
+   if (iy < 0) iy += 256;
+   if (iy < 0) iz += 256;
+   if (ix > 255) ix -= 256;
+   if (iy > 255) iy -= 256;
+   if (iz > 255) iz -= 256;
+
+   if((ix < 0 || ix > 255) || (iy < 0 || iy > 255) || (iz < 0 || iz > 255))
+     Aux_Message(stderr, "At %lf %lf %lf index %d %d %d\n",
+        x, y, z, ix, iy, iz);
+
    m_temp = (iz + 256 * (iy + 256 * ix));
 
    Acc[0] = ExtAcc_InitialField[0][m_temp];
