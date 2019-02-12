@@ -227,30 +227,32 @@ void SetGridIC( real fluid[], const double x, const double y, const double z, co
 void Init_ExternalAcc()
 {
 
+  int dim = NX0[0];
+
   size_t nread = 0;
   FILE *bin_data = fopen("UM_IC", "r");
 
-  float *density = (float *) calloc(256*256*256, sizeof(float));
-  nread = fread(density, sizeof(float), 256*256*256, bin_data);
+  float *density = (float *) calloc(dim*dim*dim, sizeof(float));
+  nread = fread(density, sizeof(float), dim*dim*dim, bin_data);
 
-  float *field_x = (float *) calloc(256*256*256, sizeof(float));
-  nread = fread(field_x, sizeof(float), 256*256*256, bin_data);
+  float *field_x = (float *) calloc(dim*dim*dim, sizeof(float));
+  nread = fread(field_x, sizeof(float), dim*dim*dim, bin_data);
 
-  float *field_y = (float *) calloc(256*256*256, sizeof(float));
-  nread = fread(field_y, sizeof(float), 256*256*256, bin_data);
+  float *field_y = (float *) calloc(dim*dim*dim, sizeof(float));
+  nread = fread(field_y, sizeof(float), dim*dim*dim, bin_data);
 
-  float *field_z = (float *) calloc(256*256*256, sizeof(float));
-  nread = fread(field_z, sizeof(float), 256*256*256, bin_data);
+  float *field_z = (float *) calloc(dim*dim*dim, sizeof(float));
+  nread = fread(field_z, sizeof(float), dim*dim*dim, bin_data);
 
-  ExtAcc_InitialField[0] = (double*)calloc(256*256*256, sizeof(double));
-  ExtAcc_InitialField[1] = (double*)calloc(256*256*256, sizeof(double));
-  ExtAcc_InitialField[2] = (double*)calloc(256*256*256, sizeof(double));
+  ExtAcc_InitialField[0] = (double*)calloc(dim*dim*dim, sizeof(double));
+  ExtAcc_InitialField[1] = (double*)calloc(dim*dim*dim, sizeof(double));
+  ExtAcc_InitialField[2] = (double*)calloc(dim*dim*dim, sizeof(double));
   
-  for( int i = 0; i < 256*256*256; i++){
+  for( int i = 0; i < dim*dim*dim; i++){
 
-    ExtAcc_InitialField[0][i] = field_x[i] / density[i];
-    ExtAcc_InitialField[1][i] = field_y[i] / density[i];
-    ExtAcc_InitialField[2][i] = field_z[i] / density[i];
+    ExtAcc_InitialField[0][i] = 1e-10 * field_x[i] / density[i];
+    ExtAcc_InitialField[1][i] = 1e-10 * field_y[i] / density[i];
+    ExtAcc_InitialField[2][i] = 1e-10 * field_z[i] / density[i];
   }
 
 

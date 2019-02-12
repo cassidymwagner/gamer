@@ -80,28 +80,27 @@ void   CPU_ExternalAcc( real Acc[], const double x, const double y, const double
 
 #  if   (defined DRIV_TURB)
    int m_temp, ix, iy, iz;
-  
-   ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * 256);
-   iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * 256);
-   iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * 256);
+   int dim = NX0[0];
+   
+   ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * dim);
+   iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * dim);
+   iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * dim);
 
-   if (ix < 0) ix += 256;
-   if (iy < 0) iy += 256;
-   if (iy < 0) iz += 256;
-   if (ix > 255) ix -= 256;
-   if (iy > 255) iy -= 256;
-   if (iz > 255) iz -= 256;
+   if (ix < 0) ix += dim;
+   if (iy < 0) iy += dim;
+   if (iy < 0) iz += dim;
+   if (ix > 255) ix -= dim;
+   if (iy > 255) iy -= dim;
+   if (iz > 255) iz -= dim;
 
-   if((ix < 0 || ix > 255) || (iy < 0 || iy > 255) || (iz < 0 || iz > 255))
-     Aux_Message(stderr, "At %lf %lf %lf index %d %d %d\n",
-        x, y, z, ix, iy, iz);
-
-   m_temp = (iz + 256 * (iy + 256 * ix));
+   m_temp = (iz + dim * (iy + dim * ix));
 
    Acc[0] = ExtAcc_InitialField[0][m_temp];
    Acc[1] = ExtAcc_InitialField[1][m_temp];
    Acc[2] = ExtAcc_InitialField[2][m_temp];
-  
+
+
+
    //free( m );
    //if ((ix == iy) && (iy == iz) && (iz == 0)) 
    // Aux_Message(stderr, "At %lf %lf %lf acc %lf %lf %lf\n",
