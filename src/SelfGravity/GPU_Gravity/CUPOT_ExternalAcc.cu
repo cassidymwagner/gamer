@@ -81,7 +81,7 @@ void   CPU_ExternalAcc( real Acc[], const double x, const double y, const double
 #  if   (defined DRIV_TURB)
    int m_temp, ix, iy, iz;
    int dim = NX0[0];
-   
+
    ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * dim);
    iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * dim);
    iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * dim);
@@ -95,11 +95,17 @@ void   CPU_ExternalAcc( real Acc[], const double x, const double y, const double
 
    m_temp = (iz + dim * (iy + dim * ix));
 
+   //printf("ENDING\n");
+   //printf("m_temp=%i\n", m_temp);
+   
    Acc[0] = ExtAcc_InitialField[0][m_temp];
    Acc[1] = ExtAcc_InitialField[1][m_temp];
    Acc[2] = ExtAcc_InitialField[2][m_temp];
 
 
+   //free(ExtAcc_InitialField[0]);
+   //free(ExtAcc_InitialField[1]);
+   //free(ExtAcc_InitialField[2]);
 
    //free( m );
    //if ((ix == iy) && (iy == iz) && (iz == 0)) 
