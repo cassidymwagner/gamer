@@ -6,7 +6,7 @@
 // =====================================================================================================
 #include "CUPOT.h"
 
-double *ExtAcc_InitialField[3]; 
+double *ExtAcc_InitialField[3] = {NULL, NULL, NULL}; 
 
 // ====================================================================================================
 
@@ -244,28 +244,23 @@ void Init_ExternalAcc()
   float *field_z = (float *) calloc(dim*dim*dim, sizeof(float));
   nread = fread(field_z, sizeof(float), dim*dim*dim, bin_data);
 
-  printf("STARTING\n");
- 
   if (ExtAcc_InitialField[0] == NULL) { 
     ExtAcc_InitialField[0] = (double*)calloc(dim*dim*dim, sizeof(double));
-    printf("Allocating 0\n");
   }
    
   if (ExtAcc_InitialField[1] == NULL) { 
     ExtAcc_InitialField[1] = (double*)calloc(dim*dim*dim, sizeof(double));
-    printf("Allocating 1\n");
   }
 
   if (ExtAcc_InitialField[2] == NULL) { 
     ExtAcc_InitialField[2] = (double*)calloc(dim*dim*dim, sizeof(double));
-    printf("Allocating 2\n");
   }
 
   for( int i = 0; i < dim*dim*dim; i++){
 
-    ExtAcc_InitialField[0][i] = field_x[i] / density[i];
-    ExtAcc_InitialField[1][i] = field_y[i] / density[i];
-    ExtAcc_InitialField[2][i] = field_z[i] / density[i];
+    ExtAcc_InitialField[0][i] = 0 * field_x[i] / density[i];
+    ExtAcc_InitialField[1][i] = 0 * field_y[i] / density[i];
+    ExtAcc_InitialField[2][i] = 0 * field_z[i] / density[i];
   }
 
 

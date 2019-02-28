@@ -109,7 +109,7 @@ OPT__MINIMIZE_MPI_BARRIER     0           # minimize MPI barriers to improve loa
 
 
 # fluid solver in HYDRO (MODEL==HYDRO only)
-GAMMA                         1.001 # ratio of specific heats (i.e., adiabatic index) [5.0/3.0]
+GAMMA                         1.001       # ratio of specific heats (i.e., adiabatic index) [5.0/3.0]
 MOLECULAR_WEIGHT              0.6         # mean molecular weight -> currently only for post-processing [0.6]
 MINMOD_COEFF                  1.5         # coefficient of the generalized MinMod limiter (1.0~2.0) [1.5]
 EP_COEFF                      1.25        # coefficient of the extrema-preserving limiter (>=1.0) [1.25] ##DEPRECATED##
@@ -147,7 +147,7 @@ SOR_MAX_ITER                 -1           # maximum number of iterations in SOR:
 SOR_MIN_ITER                 -1           # minimum number of iterations in SOR: (<0=auto) [-1]
 POT_GPU_NPGROUP              -1           # number of patch groups sent into the CPU/GPU Poisson solver (<=0=auto) [-1]
 OPT__GRA_P5_GRADIENT          0           # 5-points gradient in the Gravity solver (must have GRA/USG_GHOST_SIZE>=2) [0]
-OPT__GRAVITY_TYPE             2/3         # gravity source: (1=self-gravity, 2=external gravity, 3=both) ##2/3 for HYDRO ONLY##
+OPT__GRAVITY_TYPE             3         # gravity source: (1=self-gravity, 2=external gravity, 3=both) ##2/3 for HYDRO ONLY##
 
 
 # initialization
@@ -166,7 +166,7 @@ OPT__OUTPUT_BASEPS            0           # output the base-level power spectrum
 OPT__OUTPUT_BASE              0           # only output the base-level data [0] ##OPT__OUTPUT_PART ONLY##
 OPT__OUTPUT_POT               0           # output gravitational potential [0] ##OPT__OUTPUT_TOTAL ONLY##
 OPT__OUTPUT_MODE              1           # (1=const step, 2=const dt, 3=dump table) -> edit "Input__DumpTable" for 3
-OUTPUT_STEP                   5           # output data every OUTPUT_STEP step ##OPT__OUTPUT_MODE==1 ONLY##
+OUTPUT_STEP                   10          # output data every OUTPUT_STEP step ##OPT__OUTPUT_MODE==1 ONLY##
 OUTPUT_DT                     5.0e-1      # output data every OUTPUT_DT time interval ##OPT__OUTPUT_MODE==2 ONLY##
 OUTPUT_PART_X                 0.0         # x coordinate for OPT__OUTPUT_PART [-1.0]
 OUTPUT_PART_Y                 0.0         # y coordinate for OPT__OUTPUT_PART [-1.0]
@@ -175,7 +175,7 @@ INIT_DUMPID                  -1           # set the first dump ID (<0=auto) [-1]
 
 
 # miscellaneous
-OPT__VERBOSE                  0           # output the simulation progress in detail [0]
+OPT__VERBOSE                  1           # output the simulation progress in detail [0]
 OPT__TIMING_BARRIER          -1           # synchronize before timing -> more accurate, but may slow down the run (<0=auto) [-1]
 OPT__TIMING_BALANCE           0           # record the max/min elapsed time in various code sections for checking load balance [0]
 OPT__TIMING_MPI               0           # record the MPI bandwidth achieved in various code sections [0] ##LOAD_BALANCE ONLY##
@@ -197,3 +197,4 @@ OPT__CK_PATCH_ALLOCATE        0           # check if all patches are properly al
 OPT__CK_FLUX_ALLOCATE         0           # check if all flux arrays are properly allocated ##HYDRO and ELBDM ONLY## [0]
 OPT__CK_NEGATIVE              0           # check the negative values: (0=off, 1=density, 2=pressure and entropy, 3=both) [0] ##HYDRO ONLY##
 OPT__CK_MEMFREE               1.0         # check the free memory in GB (0=off, >0=threshold) [1.0]
+
