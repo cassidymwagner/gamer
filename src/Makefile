@@ -237,7 +237,7 @@ SIMU_OPTION += -DRANDOM_NUMBER=RNG_GNU_EXT
  CXX         = g++                                       # serial compiler
 #CXX         = $(MPI_PATH)/bin/mpicxx                    # MPI compiler
 #CXX         = CC                                        # cray wrapper script
- CXXFLAG     = -g -O3 -DH5_USE_18_API                    # general flags
+ CXXFLAG     = -g -O3 					 # general flags
 #CXXFLAG     = -g -O3 -std=c++11
 #CXXFLAG     = -g -Ofast
  CXXFLAG    += -Wall -Wextra                             # warning flags
@@ -273,7 +273,7 @@ endif
 
 # template
 CUDA_PATH    :=
-FFTW_PATH    :=
+FFTW_PATH    := /home/cwagner4/applications/
 MPI_PATH     :=
 HDF5_PATH    := /usr/include/
 GRACKLE_PATH :=

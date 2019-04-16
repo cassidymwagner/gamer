@@ -7,6 +7,7 @@
 #include "CUPOT.h"
 
 double *ExtAcc_InitialField[3] = {NULL, NULL, NULL}; 
+#endif
 
 // ====================================================================================================
 
@@ -213,6 +214,7 @@ void SetGridIC( real fluid[], const double x, const double y, const double z, co
 
 
 
+#ifdef GRAVITY
 //-------------------------------------------------------------------------------------------------------
 // Function    :  Init_ExternalAcc
 // Description :  Set the array "ExtAcc_AuxArray" used by the external acceration routines
@@ -258,9 +260,9 @@ void Init_ExternalAcc()
 
   for( int i = 0; i < dim*dim*dim; i++){
 
-    ExtAcc_InitialField[0][i] = 0 * field_x[i] / density[i];
-    ExtAcc_InitialField[1][i] = 0 * field_y[i] / density[i];
-    ExtAcc_InitialField[2][i] = 0 * field_z[i] / density[i];
+    ExtAcc_InitialField[0][i] = 1e-10 * field_x[i] / density[i];
+    ExtAcc_InitialField[1][i] = 1e-10 * field_y[i] / density[i];
+    ExtAcc_InitialField[2][i] = 1e-10 * field_z[i] / density[i];
   }
 
 
