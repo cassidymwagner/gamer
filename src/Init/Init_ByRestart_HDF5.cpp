@@ -898,24 +898,24 @@ void Init_ByRestart_HDF5( const char *FileName )
 // Note        :  1. This function works for arbitary datatype (int, float, char, 1D array ...)
 //                2. Memory must be allocated for FieldPtr in advance with sufficent size (except for "char *")
 //                3. For loading a string, which has (type(FieldPtr) = (char *)), the memory must be freed
-//                   manually by calling "free()"
-//                4. It can also compare the loaded variables (FieldPtr) with the reference value (ComprPtr)
+//                   manually by calling free()
+//                4. It can also compare the loaded variables (FieldPtr) with the reference values (ComprPtr)
 //                   (perform comparison only if "NCompr > 0")
 //                   --> Please make sure that "FieldPtr" and "ComprPtr" point to the same type since we
 //                       use the type of "ComprPtr" to typecast "FieldPtr"
 //
-// Parameter   :  FieldName         : Name of the target field
-//                FieldPtr          : Pointer to store the retrieved data
-//                H5_SetID_Target   : HDF5 dataset  ID of the target compound variable
-//                H5_TypeID_Target  : HDF5 datatype ID of the target compound variable
-//                Fatal_Nonexist    : Whether or not the nonexistence of the target field is fatal
-//                                    --> true  : terminate the program     if the target field cannot be found
-//                                        false : display a warning message if the target field cannot be found
-//                ComprPtr          : Pointer to store the reference values for comparison
-//                NCompr            : Number of elements to be compared
-//                Fatal_Compr       : Whether or not the comparison result is fatal
-//                                    --> true  : terminate the program     if "FieldPtr[X] != ComprPtr[X]"
-//                                        false : display a warning message if "FieldPtr[X] != ComprPtr[X]"
+// Parameter   :  FieldName        : Name of the target field
+//                FieldPtr         : Pointer to store the retrieved data
+//                H5_SetID_Target  : HDF5 dataset  ID of the target compound variable
+//                H5_TypeID_Target : HDF5 datatype ID of the target compound variable
+//                Fatal_Nonexist   : Whether or not the nonexistence of the target field is fatal
+//                                   --> true  : terminate the program     if the target field cannot be found
+//                                       false : display a warning message if the target field cannot be found
+//                ComprPtr         : Pointer to store the reference values for comparison
+//                NCompr           : Number of elements to be compared
+//                Fatal_Compr      : Whether or not the comparison result is fatal
+//                                   --> true  : terminate the program     if "FieldPtr[X] != ComprPtr[X]"
+//                                       false : display a warning message if "FieldPtr[X] != ComprPtr[X]"
 //
 // Return      :  Success/fail <-> 0/<0
 //-------------------------------------------------------------------------------------------------------
@@ -976,6 +976,30 @@ herr_t LoadField( const char *FieldName, void *FieldPtr, const hid_t H5_SetID_Ta
 // comparison
    char ArrayIdx[10];
 
+// compare strings
+   if ( NCompr > 0  &&  typeid(T) == typeid(char) )
+   {
+      if (  strcmp( *(char**)FieldPtr, (char*)ComprPtr ) != 0  )
+      {
+         if ( Fatal_Compr )
+         {
+            Aux_Error( ERROR_INFO, "\"%s\" : RESTART file (%s) != runtime (%s) !!\n",
+                       FieldName, *(char**)FieldPtr, (char*)ComprPtr );
+            return -2;
+         }
+
+         else
+         {
+            if ( MPI_Rank == 0 )
+            Aux_Message( stderr, "WARNING : \"%s\" : RESTART file (%s) != runtime (%s) !!\n",
+                         FieldName, *(char**)FieldPtr, (char*)ComprPtr );
+            Check_Pass = false;
+         }
+      }
+   }
+
+// compare other data types
+   else
    for (int t=0; t<NCompr; t++)
    {
       if ( NCompr == 1 )   sprintf( ArrayIdx, "%s", "" );
@@ -1398,7 +1422,7 @@ void Check_SymConst( const char *FileName, const int FormatVersion )
    LoadField( "USG_NxtF",             &RS.USG_NxtF,             SID, TID, NonFatal, &RT.USG_NxtF,              1, NonFatal );
    LoadField( "USG_NxtG",             &RS.USG_NxtG,             SID, TID, NonFatal, &RT.USG_NxtG,              1, NonFatal );
 #  endif
-   LoadField( "Gra_BlockSize_z",      &RS.Gra_BlockSize_z,      SID, TID, NonFatal, &RT.Gra_BlockSize_z,       1, NonFatal );
+   LoadField( "Gra_BlockSize",        &RS.Gra_BlockSize,        SID, TID, NonFatal, &RT.Gra_BlockSize,         1, NonFatal );
    LoadField( "ExtPotNAuxMax",        &RS.ExtPotNAuxMax,        SID, TID, NonFatal, &RT.ExtPotNAuxMax,         1, NonFatal );
    LoadField( "ExtAccNAuxMax",        &RS.ExtAccNAuxMax,        SID, TID, NonFatal, &RT.ExtAccNAuxMax,         1, NonFatal );
 #  if   ( POT_SCHEME == SOR )
@@ -1433,7 +1457,6 @@ void Check_SymConst( const char *FileName, const int FormatVersion )
    LoadField( "CheckIntermediate",    &RS.CheckIntermediate,    SID, TID, NonFatal, &RT.CheckIntermediate,     1, NonFatal );
    LoadField( "HLL_NoRefState",       &RS.HLL_NoRefState,       SID, TID, NonFatal, &RT.HLL_NoRefState,        1, NonFatal );
    LoadField( "HLL_IncludeAllWaves",  &RS.HLL_IncludeAllWaves,  SID, TID, NonFatal, &RT.HLL_IncludeAllWaves,   1, NonFatal );
-   LoadField( "WAF_Dissipate",        &RS.WAF_Dissipate,        SID, TID, NonFatal, &RT.WAF_Dissipate,         1, NonFatal );
 #  ifdef N_FC_VAR
    LoadField( "N_FC_Var",             &RS.N_FC_Var,             SID, TID, NonFatal, &RT.N_FC_Var,              1, NonFatal );
 #  endif
@@ -1460,7 +1483,7 @@ void Check_SymConst( const char *FileName, const int FormatVersion )
    LoadField( "dt_Flu_BlockSize",     &RS.dt_Flu_BlockSize,     SID, TID, NonFatal, &RT.dt_Flu_BlockSize,      1, NonFatal );
    LoadField( "dt_Flu_UseShuffle",    &RS.dt_Flu_UseShuffle,    SID, TID, NonFatal, &RT.dt_Flu_UseShuffle,     1, NonFatal );
 #  ifdef GRAVITY
-   LoadField( "dt_Gra_BlockSize_z",   &RS.dt_Gra_BlockSize_z,   SID, TID, NonFatal, &RT.dt_Gra_BlockSize_z,    1, NonFatal );
+   LoadField( "dt_Gra_BlockSize",     &RS.dt_Gra_BlockSize,     SID, TID, NonFatal, &RT.dt_Gra_BlockSize,      1, NonFatal );
    LoadField( "dt_Gra_UseShuffle",    &RS.dt_Gra_UseShuffle,    SID, TID, NonFatal, &RT.dt_Gra_UseShuffle,     1, NonFatal );
 #  endif
 
@@ -1552,6 +1575,8 @@ void Check_InputPara( const char *FileName, const int FormatVersion )
 // particle
 #  ifdef PARTICLE
    LoadField( "Par_Init",                &RS.Par_Init,                SID, TID, NonFatal, &RT.Par_Init,                 1, NonFatal );
+   LoadField( "Par_ICFormat",            &RS.Par_ICFormat,            SID, TID, NonFatal, &RT.Par_ICFormat,             1, NonFatal );
+   LoadField( "Par_ICMass",              &RS.Par_ICMass,              SID, TID, NonFatal, &RT.Par_ICMass,               1, NonFatal );
    LoadField( "Par_Interp",              &RS.Par_Interp,              SID, TID, NonFatal, &RT.Par_Interp,               1, NonFatal );
    LoadField( "Par_Integ",               &RS.Par_Integ,               SID, TID, NonFatal, &RT.Par_Integ,                1, NonFatal );
    LoadField( "Par_ImproveAcc",          &RS.Par_ImproveAcc,          SID, TID, NonFatal, &RT.Par_ImproveAcc,           1, NonFatal );
@@ -1647,9 +1672,7 @@ void Check_InputPara( const char *FileName, const int FormatVersion )
    LoadField( "Gamma",                   &RS.Gamma,                   SID, TID, NonFatal, &RT.Gamma,                    1, NonFatal );
    LoadField( "MolecularWeight",         &RS.MolecularWeight,         SID, TID, NonFatal, &RT.MolecularWeight,          1, NonFatal );
    LoadField( "MinMod_Coeff",            &RS.MinMod_Coeff,            SID, TID, NonFatal, &RT.MinMod_Coeff,             1, NonFatal );
-   LoadField( "EP_Coeff",                &RS.EP_Coeff,                SID, TID, NonFatal, &RT.EP_Coeff,                 1, NonFatal );
    LoadField( "Opt__LR_Limiter",         &RS.Opt__LR_Limiter,         SID, TID, NonFatal, &RT.Opt__LR_Limiter,          1, NonFatal );
-   LoadField( "Opt__WAF_Limiter",        &RS.Opt__WAF_Limiter,        SID, TID, NonFatal, &RT.Opt__WAF_Limiter,         1, NonFatal );
    LoadField( "Opt__1stFluxCorr",        &RS.Opt__1stFluxCorr,        SID, TID, NonFatal, &RT.Opt__1stFluxCorr,         1, NonFatal );
    LoadField( "Opt__1stFluxCorrScheme",  &RS.Opt__1stFluxCorrScheme,  SID, TID, NonFatal, &RT.Opt__1stFluxCorrScheme,   1, NonFatal );
 #  endif
@@ -1710,7 +1733,7 @@ void Check_InputPara( const char *FileName, const int FormatVersion )
 
 // Grackle
 #  ifdef SUPPORT_GRACKLE
-   LoadField( "Grackle_Mode",            &RS.Grackle_Mode,            SID, TID, NonFatal, &RT.Grackle_Mode,             1, NonFatal );
+   LoadField( "Grackle_Activate",        &RS.Grackle_Activate,        SID, TID, NonFatal, &RT.Grackle_Activate,         1, NonFatal );
    LoadField( "Grackle_Verbose",         &RS.Grackle_Verbose,         SID, TID, NonFatal, &RT.Grackle_Verbose,          1, NonFatal );
    LoadField( "Grackle_Cooling",         &RS.Grackle_Cooling,         SID, TID, NonFatal, &RT.Grackle_Cooling,          1, NonFatal );
    LoadField( "Grackle_Primordial",      &RS.Grackle_Primordial,      SID, TID, NonFatal, &RT.Grackle_Primordial,       1, NonFatal );
@@ -1719,7 +1742,7 @@ void Check_InputPara( const char *FileName, const int FormatVersion )
    LoadField( "Grackle_CMB_Floor",       &RS.Grackle_CMB_Floor,       SID, TID, NonFatal, &RT.Grackle_CMB_Floor,        1, NonFatal );
    LoadField( "Grackle_PE_Heating",      &RS.Grackle_PE_Heating,      SID, TID, NonFatal, &RT.Grackle_PE_Heating,       1, NonFatal );
    LoadField( "Grackle_PE_HeatingRate",  &RS.Grackle_PE_HeatingRate,  SID, TID, NonFatal, &RT.Grackle_PE_HeatingRate,   1, NonFatal );
-   LoadField( "Grackle_Mode",            &RS.Grackle_Mode,            SID, TID, NonFatal, &RT.Grackle_Mode,             1, NonFatal );
+   LoadField( "Grackle_CloudyTable",     &RS.Grackle_CloudyTable,     SID, TID, NonFatal,  RT.Grackle_CloudyTable,      1, NonFatal );
    LoadField( "Che_GPU_NPGroup",         &RS.Che_GPU_NPGroup,         SID, TID, NonFatal, &RT.Che_GPU_NPGroup,          1, NonFatal );
 #  endif
 
@@ -1741,6 +1764,7 @@ void Check_InputPara( const char *FileName, const int FormatVersion )
    LoadField( "Opt__RestartReset",       &RS.Opt__RestartReset,       SID, TID, NonFatal, &RT.Opt__RestartReset,        1, NonFatal );
    LoadField( "Opt__UM_IC_Level",        &RS.Opt__UM_IC_Level,        SID, TID, NonFatal, &RT.Opt__UM_IC_Level,         1, NonFatal );
    LoadField( "Opt__UM_IC_NVar",         &RS.Opt__UM_IC_NVar,         SID, TID, NonFatal, &RT.Opt__UM_IC_NVar,          1, NonFatal );
+   LoadField( "Opt__UM_IC_Format",       &RS.Opt__UM_IC_Format,       SID, TID, NonFatal, &RT.Opt__UM_IC_Format,        1, NonFatal );
    LoadField( "Opt__UM_IC_Downgrade",    &RS.Opt__UM_IC_Downgrade,    SID, TID, NonFatal, &RT.Opt__UM_IC_Downgrade,     1, NonFatal );
    LoadField( "Opt__UM_IC_Refine",       &RS.Opt__UM_IC_Refine,       SID, TID, NonFatal, &RT.Opt__UM_IC_Refine,        1, NonFatal );
    LoadField( "Opt__UM_IC_LoadNRank",    &RS.Opt__UM_IC_LoadNRank,    SID, TID, NonFatal, &RT.Opt__UM_IC_LoadNRank,     1, NonFatal );
@@ -1803,6 +1827,8 @@ void Check_InputPara( const char *FileName, const int FormatVersion )
    LoadField( "Opt__TimingBarrier",      &RS.Opt__TimingBarrier,      SID, TID, NonFatal, &RT.Opt__TimingBarrier,       1, NonFatal );
    LoadField( "Opt__TimingBalance",      &RS.Opt__TimingBalance,      SID, TID, NonFatal, &RT.Opt__TimingBalance,       1, NonFatal );
    LoadField( "Opt__TimingMPI",          &RS.Opt__TimingMPI,          SID, TID, NonFatal, &RT.Opt__TimingMPI,           1, NonFatal );
+   LoadField( "Opt__RecordNote",         &RS.Opt__RecordNote,         SID, TID, NonFatal, &RT.Opt__RecordNote,          1, NonFatal );
+   LoadField( "Opt__RecordUnphy",        &RS.Opt__RecordUnphy,        SID, TID, NonFatal, &RT.Opt__RecordUnphy,         1, NonFatal );
    LoadField( "Opt__RecordMemory",       &RS.Opt__RecordMemory,       SID, TID, NonFatal, &RT.Opt__RecordMemory,        1, NonFatal );
    LoadField( "Opt__RecordPerformance",  &RS.Opt__RecordPerformance,  SID, TID, NonFatal, &RT.Opt__RecordPerformance,   1, NonFatal );
    LoadField( "Opt__ManualControl",      &RS.Opt__ManualControl,      SID, TID, NonFatal, &RT.Opt__ManualControl,       1, NonFatal );
