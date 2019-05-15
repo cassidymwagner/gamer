@@ -47,9 +47,9 @@ void Validate()
    Aux_Error( ERROR_INFO, "GRAVITY must be enabled !!\n" );
 #  endif
 
-#  ifndef COMOVING
-   Aux_Error( ERROR_INFO, "COMOVING must be enabled !!\n" );
-#  endif
+//#  ifndef COMOVING
+//   Aux_Error( ERROR_INFO, "COMOVING must be enabled !!\n" );
+//#  endif
 
 #  ifdef PARTICLE
    Aux_Error( ERROR_INFO, "PARTICLE must be disabled !!\n" );
