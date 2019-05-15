@@ -59,22 +59,6 @@ const OptInit_t
    INIT_BY_FILE     = 3;
 
 
-// data format for OPT__INIT=INIT_BY_FILE
-typedef int UM_IC_Format_t;
-const UM_IC_Format_t
-   UM_IC_FORMAT_NONE = 0,
-   UM_IC_FORMAT_VZYX = 1,
-   UM_IC_FORMAT_ZYXV = 2;
-
-
-// data format for PAR_INIT=PAR_INIT_BY_FILE
-typedef int ParICFormat_t;
-const ParICFormat_t
-   PAR_IC_FORMAT_NONE   = 0,
-   PAR_IC_FORMAT_ATT_ID = 1,
-   PAR_IC_FORMAT_ID_ATT = 2;
-
-
 // program restart options
 typedef int OptRestartH_t;
 const OptRestartH_t
@@ -105,6 +89,16 @@ const LR_Limiter_t
    ALBADA          = 3,
    VL_GMINMOD      = 4,
    EXTPRE          = 5;
+
+
+// TVD limiters for the WAF scheme
+typedef int WAF_Limiter_t;
+const WAF_Limiter_t
+   WAF_LIMITER_NONE = 0,
+   WAF_SUPERBEE     = 1,
+   WAF_VANLEER      = 2,
+   WAF_ALBADA       = 3,
+   WAF_MINBEE       = 4;
 
 
 // data output formats
@@ -267,11 +261,6 @@ const ParOutputDens_t
    PAR_OUTPUT_DENS_NONE     = 0,
    PAR_OUTPUT_DENS_PAR_ONLY = 1,
    PAR_OUTPUT_DENS_TOTAL    = 2;
-
-typedef int ParPass2Son_t;
-const ParPass2Son_t
-   PAR_PASS2SON_GENERAL = 1,
-   PAR_PASS2SON_EVOLVE  = 2;
 #endif // #ifdef PARTICLE
 
 
@@ -340,7 +329,14 @@ typedef int FieldIdx_t;
 
 // Grackle
 #ifdef SUPPORT_GRACKLE
-// map to the "primordial_chemistry" option of Grackle
+// original Grackle or the reduced CPU/GPU implementation in GAMER
+typedef int GrackleMode_t;
+const GrackleMode_t
+   GRACKLE_MODE_NONE  = 0,
+   GRACKLE_MODE_ORI   = 1,
+   GRACKLE_MODE_GAMER = 2;
+
+// primordial chemistry
 typedef int GracklePriChe_t;
 const GracklePriChe_t
    GRACKLE_PRI_CHE_CLOUDY = 0,

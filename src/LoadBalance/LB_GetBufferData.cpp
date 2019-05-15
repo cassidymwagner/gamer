@@ -116,8 +116,7 @@ void LB_GetBufferData( const int lv, const int FluSg, const int PotSg, const Get
 #  endif
 
    const int NFluid_Max = ( GetBufMode == COARSE_FINE_FLUX ) ? NFLUX_TOTAL : NCOMP_TOTAL;
-   int NVar_Flu, NVar_Tot, TFluVarIdx, *TFluVarIdxList;
-   TFluVarIdxList = new int [NFluid_Max];
+   int NVar_Flu, NVar_Tot, TFluVarIdx, TFluVarIdxList[NFluid_Max];
    NVar_Flu = 0;
 
    for (int v=0; v<NFluid_Max; v++)
@@ -1016,7 +1015,6 @@ void LB_GetBufferData( const int lv, const int FluSg, const int PotSg, const Get
    delete [] Recv_NCount;
    delete [] Send_NDisp;
    delete [] Recv_NDisp;
-   delete [] TFluVarIdxList;
 
 } // FUNCTION : LB_GetBufferData
 

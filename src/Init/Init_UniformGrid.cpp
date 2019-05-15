@@ -107,11 +107,7 @@ void Init_UniformGrid( const int lv, const bool FindHomePatchForPar )
 
 // 3. find the home patches on lv for all particles
 #  ifdef PARTICLE
-   if ( FindHomePatchForPar )
-   {
-      const bool OldParOnly_Yes = true;
-      Par_FindHomePatch_UniformGrid( lv, OldParOnly_Yes, NULL_INT, NULL );
-   }
+   if ( FindHomePatchForPar )    Par_FindHomePatch_UniformGrid( lv );
 #  endif
 
 } // FUNCTION : Init_UniformGrid

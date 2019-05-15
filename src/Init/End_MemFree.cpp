@@ -60,13 +60,17 @@ void End_MemFree()
 #  endif
 
 #  ifdef SUPPORT_GRACKLE
-   if ( GRACKLE_ACTIVATE )
+   if ( GRACKLE_MODE != GRACKLE_MODE_NONE )
    {
+#     ifdef GPU
+      CUAPI_MemFree_Grackle();
+#     else
       End_MemFree_Grackle();
+#     endif
 
       if ( Che_FieldData != NULL )
       {
-         delete Che_FieldData;
+         delete [] Che_FieldData;
          Che_FieldData = NULL;
       }
    }

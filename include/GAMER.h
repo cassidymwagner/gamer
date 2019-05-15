@@ -15,9 +15,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <math.h>
-#ifndef __APPLE__
 #include <malloc.h>
-#endif
 #include <stdio.h>
 #include <unistd.h>
 
