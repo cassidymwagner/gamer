@@ -132,7 +132,7 @@ SIMU_OPTION += -DUNSPLIT_GRAVITY
 
 # comoving frame for cosmological simulations
 # --> not supported for PARTICLE
-#SIMU_OPTION += -DCOMOVING
+SIMU_OPTION += -DCOMOVING
 endif # GRAVITY
 
 
