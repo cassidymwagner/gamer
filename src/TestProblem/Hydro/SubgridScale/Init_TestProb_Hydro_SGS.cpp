@@ -47,9 +47,9 @@ void Validate()
    Aux_Error( ERROR_INFO, "GRAVITY must be enabled !!\n" );
 #  endif
 
-#  ifndef COMOVING
-   Aux_Error( ERROR_INFO, "COMOVING must be enabled !!\n" );
-#  endif
+//#  ifndef COMOVING
+//   Aux_Error( ERROR_INFO, "COMOVING must be enabled !!\n" );
+//#  endif
 
 #  ifdef PARTICLE
    Aux_Error( ERROR_INFO, "PARTICLE must be disabled !!\n" );
@@ -260,9 +260,9 @@ void Init_ExternalAcc()
 
   for( int i = 0; i < dim*dim*dim; i++){
 
-    ExtAcc_InitialField[0][i] = 1e-10 * field_x[i] / density[i];
-    ExtAcc_InitialField[1][i] = 1e-10 * field_y[i] / density[i];
-    ExtAcc_InitialField[2][i] = 1e-10 * field_z[i] / density[i];
+    ExtAcc_InitialField[0][i] = 1e1 * field_x[i] / density[i];
+    ExtAcc_InitialField[1][i] = 1e1 * field_y[i] / density[i];
+    ExtAcc_InitialField[2][i] = 1e1 * field_z[i] / density[i];
   }
 
 
