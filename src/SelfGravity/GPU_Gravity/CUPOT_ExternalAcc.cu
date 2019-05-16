@@ -94,23 +94,10 @@ void   CPU_ExternalAcc( real Acc[], const double x, const double y, const double
    if (iz > 255) iz -= dim;
 
    m_temp = (iz + dim * (iy + dim * ix));
-
-   //printf("ENDING\n");
-   //printf("m_temp=%i\n", m_temp);
    
    Acc[0] = ExtAcc_InitialField[0][m_temp];
    Acc[1] = ExtAcc_InitialField[1][m_temp];
    Acc[2] = ExtAcc_InitialField[2][m_temp];
-
-
-   //free(ExtAcc_InitialField[0]);
-   //free(ExtAcc_InitialField[1]);
-   //free(ExtAcc_InitialField[2]);
-
-   //free( m );
-   //if ((ix == iy) && (iy == iz) && (iz == 0)) 
-   // Aux_Message(stderr, "At %lf %lf %lf acc %lf %lf %lf\n",
-   //     x, y, z, Acc[0], Acc[1], Acc[2]);
 
 #  endif
 

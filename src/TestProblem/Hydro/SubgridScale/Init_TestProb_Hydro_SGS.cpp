@@ -18,6 +18,7 @@ static double SphCol_Dens_Delta;    // top-hat mass density --> total density = 
 static double SphCol_Engy_Bg;       // background energy density
 static double SphCol_Radius;        // top-hat radius
 static double SphCol_Center[3];     // top-hat center
+static double DrivAmp;		    // amplitude for driving term
 // =======================================================================================
 
 
@@ -126,6 +127,7 @@ void SetParameter()
    ReadPara->Add( "SphCol_Center_Y",   &SphCol_Center[1],      -1.0,          NoMin_double,     NoMax_double      );
    ReadPara->Add( "SphCol_Center_Z",   &SphCol_Center[2],      -1.0,          NoMin_double,     NoMax_double      );
 
+   ReadPara->Add( "DrivAmp",   	       &DrivAmp,      		1.0,          NoMin_double,     NoMax_double      );
    ReadPara->Read( FileName );
 
    delete ReadPara;
@@ -166,6 +168,7 @@ void SetParameter()
       Aux_Message( stdout, "  top-hat center x          = %13.7e\n", SphCol_Center[0]  );
       Aux_Message( stdout, "  ...            y          = %13.7e\n", SphCol_Center[1]  );
       Aux_Message( stdout, "  ...            z          = %13.7e\n", SphCol_Center[2]  );
+      Aux_Message( stdout, "  driv amplitude            = %13.7e\n", DrivAmp	       );
       Aux_Message( stdout, "=============================================================================\n" );
    }
 
@@ -260,9 +263,9 @@ void Init_ExternalAcc()
 
   for( int i = 0; i < dim*dim*dim; i++){
 
-    ExtAcc_InitialField[0][i] = 1e-10 * field_x[i] / density[i];
-    ExtAcc_InitialField[1][i] = 1e-10 * field_y[i] / density[i];
-    ExtAcc_InitialField[2][i] = 1e-10 * field_z[i] / density[i];
+    ExtAcc_InitialField[0][i] = DrivAmp * field_x[i] / density[i];
+    ExtAcc_InitialField[1][i] = DrivAmp * field_y[i] / density[i];
+    ExtAcc_InitialField[2][i] = DrivAmp * field_z[i] / density[i];
   }
 
 
