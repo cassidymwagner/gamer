@@ -52,36 +52,21 @@ SIMU_OPTION += -DGRAVITY
 # (b-1) hydro options
 # ------------------------------------------------------------------------------------
 ifeq "$(filter -DMODEL=HYDRO, $(SIMU_OPTION))" "-DMODEL=HYDRO"
-<<<<<<< HEAD
 # hydrodynamic scheme: RTVD/WAF/MHM/MHM_RP/CTU
 # --> must be set when MODEL=HYDRO; WAF is deprecated
 SIMU_OPTION += -DFLU_SCHEME=MHM
-=======
-# hydrodynamic scheme: RTVD/MHM/MHM_RP/CTU
-# --> must be set when MODEL=HYDRO
-SIMU_OPTION += -DFLU_SCHEME=CTU
->>>>>>> 062870d9c7e5be7e87df41f3e1e267bc2c5cbc47
 
 # scheme of spatial data reconstruction: PLM/PPM (piecewise-linear/piecewise-parabolic)
 # --> useless for RTVD
 SIMU_OPTION += -DLR_SCHEME=PPM
 
 # Riemann solver: EXACT/ROE/HLLE/HLLC
-<<<<<<< HEAD
 # --> all are useless for RTVD; HLLE/HLLC are useless for WAF
 SIMU_OPTION += -DRSOLVER=HLLC
 
 # dual energy formalism: DE_ENPY/DE_EINT (evolve entropy or internal energy)
 # --> DE_EINT is not supported yet; useless for RTVD/WAF
 SIMU_OPTION += -DDUAL_ENERGY=DE_ENPY
-=======
-# --> useless for RTVD
-SIMU_OPTION += -DRSOLVER=ROE
-
-# dual energy formalism: DE_ENPY/DE_EINT (evolve entropy or internal energy)
-# --> DE_EINT is not supported yet; useless for RTVD
-#SIMU_OPTION += -DDUAL_ENERGY=DE_ENPY
->>>>>>> 062870d9c7e5be7e87df41f3e1e267bc2c5cbc47
 
 # number of user-defined passively advected scalars
 # --> set it to 0 or comment it out if none is required
