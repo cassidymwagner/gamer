@@ -17,7 +17,7 @@ BOX_SIZE                      1.0         # box size along the longest side (in 
 NX0_TOT_X                     256         # number of base-level cells along x
 NX0_TOT_Y                     256         # number of base-level cells along y
 NX0_TOT_Z                     256         # number of base-level cells along z
-OMP_NTHREAD                  30           # number of OpenMP threads (<=0=auto -> omp_get_max_threads) [-1] ##OPENMP ONLY##
+OMP_NTHREAD                  32           # number of OpenMP threads (<=0=auto -> omp_get_max_threads) [-1] ##OPENMP ONLY##
 END_T                        0.025        # end physical time (<0=auto -> must be set by test problems or restart) [-1.0]
 END_STEP                     10000        # end step (<0=auto -> must be set by test problems or restart) [-1]
 
@@ -167,7 +167,7 @@ OPT__OUTPUT_BASE              0           # only output the base-level data [0] 
 OPT__OUTPUT_POT               0           # output gravitational potential [0] ##OPT__OUTPUT_TOTAL ONLY##
 OPT__OUTPUT_MODE              1           # (1=const step, 2=const dt, 3=dump table) -> edit "Input__DumpTable" for 3
 OUTPUT_STEP                   10          # output data every OUTPUT_STEP step ##OPT__OUTPUT_MODE==1 ONLY##
-OUTPUT_DT                     5.0e-1      # output data every OUTPUT_DT time interval ##OPT__OUTPUT_MODE==2 ONLY##
+OUTPUT_DT                     1.0e-4      # output data every OUTPUT_DT time interval ##OPT__OUTPUT_MODE==2 ONLY##
 OUTPUT_PART_X                 0.0         # x coordinate for OPT__OUTPUT_PART [-1.0]
 OUTPUT_PART_Y                 0.0         # y coordinate for OPT__OUTPUT_PART [-1.0]
 OUTPUT_PART_Z                 0.0         # z coordinate for OPT__OUTPUT_PART [-1.0]

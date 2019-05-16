@@ -192,7 +192,7 @@ struct SymConst_t
    int    USG_NxtG;
 #  endif
 
-   int    Gra_BlockSize_z;
+   int    Gra_BlockSize;
    int    ExtPotNAuxMax;
    int    ExtAccNAuxMax;
 
@@ -230,7 +230,6 @@ struct SymConst_t
    int    CheckIntermediate;
    int    HLL_NoRefState;
    int    HLL_IncludeAllWaves;
-   int    WAF_Dissipate;
 
 #  ifdef N_FC_VAR
    int    N_FC_Var;
@@ -261,7 +260,7 @@ struct SymConst_t
    int    dt_Flu_BlockSize;
    int    dt_Flu_UseShuffle;
 #  ifdef GRAVITY
-   int    dt_Gra_BlockSize_z;
+   int    dt_Gra_BlockSize;
    int    dt_Gra_UseShuffle;
 #  endif
 
@@ -311,6 +310,8 @@ struct InputPara_t
 // particle
 #  ifdef PARTICLE
    int    Par_Init;
+   int    Par_ICFormat;
+   double Par_ICMass;
    int    Par_Interp;
    int    Par_Integ;
    int    Par_ImproveAcc;
@@ -406,9 +407,7 @@ struct InputPara_t
    double Gamma;
    double MolecularWeight;
    double MinMod_Coeff;
-   double EP_Coeff;
    int    Opt__LR_Limiter;
-   int    Opt__WAF_Limiter;
    int    Opt__1stFluxCorr;
    int    Opt__1stFluxCorrScheme;
 #  endif
@@ -470,7 +469,7 @@ struct InputPara_t
 
 // Grackle
 #  ifdef SUPPORT_GRACKLE
-   int    Grackle_Mode;
+   int    Grackle_Activate;
    int    Grackle_Verbose;
    int    Grackle_Cooling;
    int    Grackle_Primordial;
@@ -501,6 +500,7 @@ struct InputPara_t
    int    Opt__RestartReset;
    int    Opt__UM_IC_Level;
    int    Opt__UM_IC_NVar;
+   int    Opt__UM_IC_Format;
    int    Opt__UM_IC_Downgrade;
    int    Opt__UM_IC_Refine;
    int    Opt__UM_IC_LoadNRank;
@@ -554,6 +554,8 @@ struct InputPara_t
    int    Opt__TimingBarrier;
    int    Opt__TimingBalance;
    int    Opt__TimingMPI;
+   int    Opt__RecordNote;
+   int    Opt__RecordUnphy;
    int    Opt__RecordMemory;
    int    Opt__RecordPerformance;
    int    Opt__ManualControl;

@@ -69,7 +69,7 @@ Procedure for outputting new variables:
 
 
 //-------------------------------------------------------------------------------------------------------
-// Function    :  Output_DumpData_Total_HDF5 (FormatVersion = 2300)
+// Function    :  Output_DumpData_Total_HDF5 (FormatVersion = 2308)
 // Description :  Output all simulation data in the HDF5 format, which can be used as a restart file
 //                or loaded by YT
 //
@@ -157,6 +157,14 @@ Procedure for outputting new variables:
 //                                      particle attributes
 //                                      --> imcompatible with version 2266 for the data with user-defined grid fields
 //                                          and particle attributes as their labels may have changed
+//                2301 : 2018/07/24 --> add OPT__UM_IC_FORMAT, PAR_IC_FORMAT, and PAR_IC_MASS
+//                2302 : 2018/07/24 --> Replace GRACKLE_MODE by GRACKLE_ACTIVATE
+//                2303 : 2018/10/04 --> Set "CodeVersion" to VERSION defined in Macro.h
+//                2304 : 2018/12/10 --> Remove EP_Coeff that no longer exists
+//                2305 : 2018/12/15 --> Remove variables related to the WAF scheme
+//                2306 : 2018/12/25 --> Replace DT_GRA_BLOCK_SIZE_Z by DT_GRA_BLOCK_SIZE
+//                2307 : 2018/12/27 --> Replace GRA_BLOCK_SIZE_Z by GRA_BLOCK_SIZE
+//                2308 : 2019/03/14 --> add OPT__RECORD_NOTE and OPT__RECORD_UNPHY
 //-------------------------------------------------------------------------------------------------------
 void Output_DumpData_Total_HDF5( const char *FileName )
 {
@@ -1222,7 +1230,7 @@ void FillIn_KeyInfo( KeyInfo_t &KeyInfo )
 
    const time_t CalTime   = time( NULL );    // calendar time
 
-   KeyInfo.FormatVersion  = 2300;
+   KeyInfo.FormatVersion  = 2308;
    KeyInfo.Model          = MODEL;
    KeyInfo.NLevel         = NLEVEL;
    KeyInfo.NCompFluid     = NCOMP_FLUID;
@@ -1268,7 +1276,7 @@ void FillIn_KeyInfo( KeyInfo_t &KeyInfo )
       KeyInfo.dTime_AllLv   [lv] = dTime_AllLv   [lv];
    }
 
-   KeyInfo.CodeVersion  = (char*)"gamer";
+   KeyInfo.CodeVersion  = (char*)VERSION;
    KeyInfo.DumpWallTime = ctime( &CalTime );
    KeyInfo.DumpWallTime[ strlen(KeyInfo.DumpWallTime)-1 ] = '\0';  // remove the last character '\n'
 
@@ -1534,7 +1542,7 @@ void FillIn_SymConst( SymConst_t &SymConst )
    SymConst.USG_NxtG             = USG_NXT_G;
 #  endif
 
-   SymConst.Gra_BlockSize_z      = GRA_BLOCK_SIZE_Z;
+   SymConst.Gra_BlockSize        = GRA_BLOCK_SIZE;
    SymConst.ExtPotNAuxMax        = EXT_POT_NAUX_MAX;
    SymConst.ExtAccNAuxMax        = EXT_ACC_NAUX_MAX;
 
@@ -1616,11 +1624,6 @@ void FillIn_SymConst( SymConst_t &SymConst )
 #  else
    SymConst.HLL_IncludeAllWaves  = 0;
 #  endif
-#  ifdef WAF_DISSIPATE
-   SymConst.WAF_Dissipate        = 1;
-#  else
-   SymConst.WAF_Dissipate        = 0;
-#  endif
 
 #  ifdef N_FC_VAR
    SymConst.N_FC_Var             = N_FC_VAR;
@@ -1656,7 +1659,7 @@ void FillIn_SymConst( SymConst_t &SymConst )
    SymConst.dt_Flu_UseShuffle    = 0;
 #  endif
 #  ifdef GRAVITY
-   SymConst.dt_Gra_BlockSize_z   = DT_GRA_BLOCK_SIZE_Z;
+   SymConst.dt_Gra_BlockSize     = DT_GRA_BLOCK_SIZE;
 #  ifdef DT_GRA_USE_SHUFFLE
    SymConst.dt_Gra_UseShuffle    = 1;
 #  else
@@ -1715,6 +1718,8 @@ void FillIn_InputPara( InputPara_t &InputPara )
 // particle
 #  ifdef PARTICLE
    InputPara.Par_Init                = amr->Par->Init;
+   InputPara.Par_ICFormat            = amr->Par->ParICFormat;
+   InputPara.Par_ICMass              = amr->Par->ParICMass;
    InputPara.Par_Interp              = amr->Par->Interp;
    InputPara.Par_Integ               = amr->Par->Integ;
    InputPara.Par_ImproveAcc          = amr->Par->ImproveAcc;
@@ -1811,9 +1816,7 @@ void FillIn_InputPara( InputPara_t &InputPara )
    InputPara.Gamma                   = GAMMA;
    InputPara.MolecularWeight         = MOLECULAR_WEIGHT;
    InputPara.MinMod_Coeff            = MINMOD_COEFF;
-   InputPara.EP_Coeff                = EP_COEFF;
    InputPara.Opt__LR_Limiter         = OPT__LR_LIMITER;
-   InputPara.Opt__WAF_Limiter        = OPT__WAF_LIMITER;
    InputPara.Opt__1stFluxCorr        = OPT__1ST_FLUX_CORR;
    InputPara.Opt__1stFluxCorrScheme  = OPT__1ST_FLUX_CORR_SCHEME;
 #  endif
@@ -1881,7 +1884,7 @@ void FillIn_InputPara( InputPara_t &InputPara )
 
 // Grackle
 #  ifdef SUPPORT_GRACKLE
-   InputPara.Grackle_Mode            = GRACKLE_MODE;
+   InputPara.Grackle_Activate        = GRACKLE_ACTIVATE;
    InputPara.Grackle_Verbose         = GRACKLE_VERBOSE;
    InputPara.Grackle_Cooling         = GRACKLE_COOLING;
    InputPara.Grackle_Primordial      = GRACKLE_PRIMORDIAL;
@@ -1912,6 +1915,7 @@ void FillIn_InputPara( InputPara_t &InputPara )
    InputPara.Opt__RestartReset       = OPT__RESTART_RESET;
    InputPara.Opt__UM_IC_Level        = OPT__UM_IC_LEVEL;
    InputPara.Opt__UM_IC_NVar         = OPT__UM_IC_NVAR;
+   InputPara.Opt__UM_IC_Format       = OPT__UM_IC_FORMAT;
    InputPara.Opt__UM_IC_Downgrade    = OPT__UM_IC_DOWNGRADE;
    InputPara.Opt__UM_IC_Refine       = OPT__UM_IC_REFINE;
    InputPara.Opt__UM_IC_LoadNRank    = OPT__UM_IC_LOAD_NRANK;
@@ -1965,6 +1969,8 @@ void FillIn_InputPara( InputPara_t &InputPara )
    InputPara.Opt__TimingBarrier      = OPT__TIMING_BARRIER;
    InputPara.Opt__TimingBalance      = OPT__TIMING_BALANCE;
    InputPara.Opt__TimingMPI          = OPT__TIMING_MPI;
+   InputPara.Opt__RecordNote         = OPT__RECORD_NOTE;
+   InputPara.Opt__RecordUnphy        = OPT__RECORD_UNPHY;
    InputPara.Opt__RecordMemory       = OPT__RECORD_MEMORY;
    InputPara.Opt__RecordPerformance  = OPT__RECORD_PERFORMANCE;
    InputPara.Opt__ManualControl      = OPT__MANUAL_CONTROL;
@@ -2230,7 +2236,7 @@ void GetCompound_SymConst( hid_t &H5_TypeID )
    H5Tinsert( H5_TypeID, "USG_NxtF",             HOFFSET(SymConst_t,USG_NxtF            ), H5T_NATIVE_INT    );
    H5Tinsert( H5_TypeID, "USG_NxtG",             HOFFSET(SymConst_t,USG_NxtG            ), H5T_NATIVE_INT    );
 #  endif
-   H5Tinsert( H5_TypeID, "Gra_BlockSize_z",      HOFFSET(SymConst_t,Gra_BlockSize_z     ), H5T_NATIVE_INT    );
+   H5Tinsert( H5_TypeID, "Gra_BlockSize",        HOFFSET(SymConst_t,Gra_BlockSize       ), H5T_NATIVE_INT    );
    H5Tinsert( H5_TypeID, "ExtPotNAuxMax",        HOFFSET(SymConst_t,ExtPotNAuxMax       ), H5T_NATIVE_INT    );
    H5Tinsert( H5_TypeID, "ExtAccNAuxMax",        HOFFSET(SymConst_t,ExtAccNAuxMax       ), H5T_NATIVE_INT    );
 #  if   ( POT_SCHEME == SOR )
@@ -2262,7 +2268,6 @@ void GetCompound_SymConst( hid_t &H5_TypeID )
    H5Tinsert( H5_TypeID, "CheckIntermediate",    HOFFSET(SymConst_t,CheckIntermediate   ), H5T_NATIVE_INT    );
    H5Tinsert( H5_TypeID, "HLL_NoRefState",       HOFFSET(SymConst_t,HLL_NoRefState      ), H5T_NATIVE_INT    );
    H5Tinsert( H5_TypeID, "HLL_IncludeAllWaves",  HOFFSET(SymConst_t,HLL_IncludeAllWaves ), H5T_NATIVE_INT    );
-   H5Tinsert( H5_TypeID, "WAF_Dissipate",        HOFFSET(SymConst_t,WAF_Dissipate       ), H5T_NATIVE_INT    );
 #  ifdef N_FC_VAR
    H5Tinsert( H5_TypeID, "N_FC_Var",             HOFFSET(SymConst_t,N_FC_Var            ), H5T_NATIVE_INT    );
 #  endif
@@ -2289,7 +2294,7 @@ void GetCompound_SymConst( hid_t &H5_TypeID )
    H5Tinsert( H5_TypeID, "dt_Flu_BlockSize",     HOFFSET(SymConst_t,dt_Flu_BlockSize    ), H5T_NATIVE_INT    );
    H5Tinsert( H5_TypeID, "dt_Flu_UseShuffle",    HOFFSET(SymConst_t,dt_Flu_UseShuffle   ), H5T_NATIVE_INT    );
 #  ifdef GRAVITY
-   H5Tinsert( H5_TypeID, "dt_Gra_BlockSize_z",   HOFFSET(SymConst_t,dt_Gra_BlockSize_z  ), H5T_NATIVE_INT    );
+   H5Tinsert( H5_TypeID, "dt_Gra_BlockSize",     HOFFSET(SymConst_t,dt_Gra_BlockSize    ), H5T_NATIVE_INT    );
    H5Tinsert( H5_TypeID, "dt_Gra_UseShuffle",    HOFFSET(SymConst_t,dt_Gra_UseShuffle   ), H5T_NATIVE_INT    );
 #  endif
 
@@ -2384,6 +2389,8 @@ void GetCompound_InputPara( hid_t &H5_TypeID )
 // particle
 #  ifdef PARTICLE
    H5Tinsert( H5_TypeID, "Par_Init",                HOFFSET(InputPara_t,Par_Init               ), H5T_NATIVE_INT     );
+   H5Tinsert( H5_TypeID, "Par_ICFormat",            HOFFSET(InputPara_t,Par_ICFormat           ), H5T_NATIVE_INT     );
+   H5Tinsert( H5_TypeID, "Par_ICMass",              HOFFSET(InputPara_t,Par_ICMass             ), H5T_NATIVE_DOUBLE  );
    H5Tinsert( H5_TypeID, "Par_Interp",              HOFFSET(InputPara_t,Par_Interp             ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Par_Integ",               HOFFSET(InputPara_t,Par_Integ              ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Par_ImproveAcc",          HOFFSET(InputPara_t,Par_ImproveAcc         ), H5T_NATIVE_INT     );
@@ -2489,9 +2496,7 @@ void GetCompound_InputPara( hid_t &H5_TypeID )
    H5Tinsert( H5_TypeID, "Gamma",                   HOFFSET(InputPara_t,Gamma                  ), H5T_NATIVE_DOUBLE  );
    H5Tinsert( H5_TypeID, "MolecularWeight",         HOFFSET(InputPara_t,MolecularWeight        ), H5T_NATIVE_DOUBLE  );
    H5Tinsert( H5_TypeID, "MinMod_Coeff",            HOFFSET(InputPara_t,MinMod_Coeff           ), H5T_NATIVE_DOUBLE  );
-   H5Tinsert( H5_TypeID, "EP_Coeff",                HOFFSET(InputPara_t,EP_Coeff               ), H5T_NATIVE_DOUBLE  );
    H5Tinsert( H5_TypeID, "Opt__LR_Limiter",         HOFFSET(InputPara_t,Opt__LR_Limiter        ), H5T_NATIVE_INT     );
-   H5Tinsert( H5_TypeID, "Opt__WAF_Limiter",        HOFFSET(InputPara_t,Opt__WAF_Limiter       ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Opt__1stFluxCorr",        HOFFSET(InputPara_t,Opt__1stFluxCorr       ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Opt__1stFluxCorrScheme",  HOFFSET(InputPara_t,Opt__1stFluxCorrScheme ), H5T_NATIVE_INT     );
 #  endif
@@ -2565,7 +2570,7 @@ void GetCompound_InputPara( hid_t &H5_TypeID )
 
 // Grackle
 #  ifdef SUPPORT_GRACKLE
-   H5Tinsert( H5_TypeID, "Grackle_Mode",            HOFFSET(InputPara_t,Grackle_Mode           ), H5T_NATIVE_INT     );
+   H5Tinsert( H5_TypeID, "Grackle_Activate",        HOFFSET(InputPara_t,Grackle_Activate       ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Grackle_Verbose",         HOFFSET(InputPara_t,Grackle_Verbose        ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Grackle_Cooling",         HOFFSET(InputPara_t,Grackle_Cooling        ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Grackle_Primordial",      HOFFSET(InputPara_t,Grackle_Primordial     ), H5T_NATIVE_INT     );
@@ -2596,6 +2601,7 @@ void GetCompound_InputPara( hid_t &H5_TypeID )
    H5Tinsert( H5_TypeID, "Opt__RestartReset",       HOFFSET(InputPara_t,Opt__RestartReset      ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Opt__UM_IC_Level",        HOFFSET(InputPara_t,Opt__UM_IC_Level       ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Opt__UM_IC_NVar",         HOFFSET(InputPara_t,Opt__UM_IC_NVar        ), H5T_NATIVE_INT     );
+   H5Tinsert( H5_TypeID, "Opt__UM_IC_Format",       HOFFSET(InputPara_t,Opt__UM_IC_Format      ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Opt__UM_IC_Downgrade",    HOFFSET(InputPara_t,Opt__UM_IC_Downgrade   ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Opt__UM_IC_Refine",       HOFFSET(InputPara_t,Opt__UM_IC_Refine      ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Opt__UM_IC_LoadNRank",    HOFFSET(InputPara_t,Opt__UM_IC_LoadNRank   ), H5T_NATIVE_INT     );
@@ -2649,6 +2655,8 @@ void GetCompound_InputPara( hid_t &H5_TypeID )
    H5Tinsert( H5_TypeID, "Opt__TimingBarrier",      HOFFSET(InputPara_t,Opt__TimingBarrier     ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Opt__TimingBalance",      HOFFSET(InputPara_t,Opt__TimingBalance     ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Opt__TimingMPI",          HOFFSET(InputPara_t,Opt__TimingMPI         ), H5T_NATIVE_INT     );
+   H5Tinsert( H5_TypeID, "Opt__RecordNote",         HOFFSET(InputPara_t,Opt__RecordNote        ), H5T_NATIVE_INT     );
+   H5Tinsert( H5_TypeID, "Opt__RecordUnphy",        HOFFSET(InputPara_t,Opt__RecordUnphy       ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Opt__RecordMemory",       HOFFSET(InputPara_t,Opt__RecordMemory      ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Opt__RecordPerformance",  HOFFSET(InputPara_t,Opt__RecordPerformance ), H5T_NATIVE_INT     );
    H5Tinsert( H5_TypeID, "Opt__ManualControl",      HOFFSET(InputPara_t,Opt__ManualControl     ), H5T_NATIVE_INT     );

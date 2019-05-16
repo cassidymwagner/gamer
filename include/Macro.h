@@ -14,6 +14,10 @@
 // ## Symbolic Constants ##
 // ########################
 
+// current version
+#define VERSION      "gamer-2.1.0.dev"
+
+
 // option == NONE --> the option is turned off
 #define NONE         0
 
@@ -35,7 +39,6 @@
 
 // hydrodynamic schemes
 #define RTVD         1
-#define WAF          2
 #define MHM          3
 #define MHM_RP       4
 #define CTU          5
@@ -372,8 +375,6 @@
 #if   ( MODEL == HYDRO )   // hydro
 #  if   ( FLU_SCHEME == RTVD )
 #        define FLU_GHOST_SIZE      3
-#  elif ( FLU_SCHEME == WAF )
-#        define FLU_GHOST_SIZE      2
 #  elif ( FLU_SCHEME == MHM )
 #     if ( LR_SCHEME == PLM )
 #        define FLU_GHOST_SIZE      2
@@ -494,16 +495,6 @@
 #     define RHO_GHOST_SIZE      ( POT_GHOST_SIZE-1 )
 
 #endif // #ifdef GRAVITY
-
-
-// Grackle constants
-#ifdef SUPPORT_GRACKLE
-
-#  define CHE_NPREP              4
-#  define CHE_NIN                3
-#  define CHE_NOUT               1
-
-#endif // #ifdef SUPPORT_GRACKLE
 
 
 // patch size (number of cells of a single patch in the x/y/z directions)
@@ -749,7 +740,7 @@
 #  undef LR_SCHEME
 #  endif
 
-#  if ( FLU_SCHEME != MHM  &&  FLU_SCHEME != MHM_RP  &&  FLU_SCHEME != CTU  &&  FLU_SCHEME != WAF )
+#  if ( FLU_SCHEME != MHM  &&  FLU_SCHEME != MHM_RP  &&  FLU_SCHEME != CTU )
 #  undef RSOLVER
 #  endif
 
