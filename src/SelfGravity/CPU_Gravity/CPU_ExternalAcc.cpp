@@ -10,9 +10,13 @@
 
 
 // soften length implementation
-#  define SOFTEN_PLUMMER
+//#  define SOFTEN_PLUMMER
 //#  define SOFTEN_RUFFERT
+#   define DRIV_TURB
 
+#  if   (defined DRIV_TURB)
+extern double* ExtAcc_InitialField[3];
+#  endif
 
 
 
@@ -69,6 +73,29 @@ void ExternalAcc( real Acc[], const double x, const double y, const double z, co
    Acc[0] = -GM*_r3*dx;
    Acc[1] = -GM*_r3*dy;
    Acc[2] = -GM*_r3*dz;
+
+#  if   (defined DRIV_TURB)
+   int m_temp, ix, iy, iz;
+   int dim = NX0[0];
+
+   ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * dim);
+   iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * dim);
+   iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * dim);
+
+   if (ix < 0) ix += dim;
+   if (iy < 0) iy += dim;
+   if (iy < 0) iz += dim;
+   if (ix > 255) ix -= dim;
+   if (iy > 255) iy -= dim;
+   if (iz > 255) iz -= dim;
+
+   m_temp = (iz + dim * (iy + dim * ix));
+   
+   Acc[0] = ExtAcc_InitialField[0][m_temp];
+   Acc[1] = ExtAcc_InitialField[1][m_temp];
+   Acc[2] = ExtAcc_InitialField[2][m_temp];
+
+#  endif
 
 } // FUNCTION : ExternalAcc
 

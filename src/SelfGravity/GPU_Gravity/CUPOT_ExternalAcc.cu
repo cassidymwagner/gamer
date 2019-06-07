@@ -1,11 +1,13 @@
-#ifdef __CUDACC__
-#include "Macro.h"
-#else
-#include "GAMER.h"
-#endif
+#ifndef __EXTERNALACC__
+#define __EXTERNALACC__
+
+
+
 #include "CUPOT.h"
 
 #ifdef GRAVITY
+
+
 
 // soften length implementation
 //#  define SOFTEN_PLUMMER
@@ -18,16 +20,13 @@ extern double* ExtAcc_InitialField[3];
 
 
 
-
 //-----------------------------------------------------------------------------------------
-// Function    :  CUPOT_ExternalAcc / CPU_ExternlAcc
+// Function    :  ExternalAcc
 // Description :  Calculate the external acceleration at the given coordinates and time
 //
-// Note        :  1. This function will be invoked by both CPU and GPU
-//                2. "__forceinline__" is required since this device function will be invoked
-//                   by more than one kernels (e.g., CUPOT_HydroGravitySolver, CUFLU_ComputeFlux)
-//                3. The auxiliary array "UserArray" is set by "Init_ExternalAcc_Ptr", which
-//                   points to "Init_ExternalAcc()" by default but may be overwritten by various
+// Note        :  1. This function is shared by CPU and GPU
+//                3. Axiliary array UserArray[] is set by "Init_ExternalAcc_Ptr", which
+//                   points to Init_ExternalAcc() by default but may be overwritten by various
 //                   test problem initializers
 //                4. By default we assume
 //                     UserArray[0] = x coordinate of the external acceleration center
@@ -35,7 +34,7 @@ extern double* ExtAcc_InitialField[3];
 //                     UserArray[2] = z ..
 //                     UserArray[3] = gravitational_constant*point_source_mass
 //                     UserArray[4] = soften_length (<=0.0 --> disable)
-//                   --> but one can easily modify this file to change the default behavior
+//                   --> But one can easily modify this file to change the default behavior
 //                5. Two different soften length implementations are supported
 //                   --> SOFTEN_PLUMMER & SOFTEN_RUFFERT
 //
@@ -46,13 +45,10 @@ extern double* ExtAcc_InitialField[3];
 //
 // Return      :  Acc
 //-----------------------------------------------------------------------------------------
-#ifdef __CUDACC__
-__forceinline__ __device__
-void CUPOT_ExternalAcc( real Acc[], const double x, const double y, const double z, const double Time, const double UserArray[] )
-#else
-void   CPU_ExternalAcc( real Acc[], const double x, const double y, const double z, const double Time, const double UserArray[] )
-#endif
+GPU_DEVICE
+void ExternalAcc( real Acc[], const double x, const double y, const double z, const double Time, const double UserArray[] )
 {
+
    const double Cen[3] = { UserArray[0], UserArray[1], UserArray[2] };
    const real GM       = (real)UserArray[3];
    const real eps      = (real)UserArray[4];
@@ -101,8 +97,12 @@ void   CPU_ExternalAcc( real Acc[], const double x, const double y, const double
 
 #  endif
 
-} // FUNCTION : CUPOT_ExternalAcc / CPU_ExternalAcc
+} // FUNCTION : ExternalAcc
 
 
 
 #endif // #ifdef GRAVITY
+
+
+
+#endif // #ifndef __EXTERNALACC__
