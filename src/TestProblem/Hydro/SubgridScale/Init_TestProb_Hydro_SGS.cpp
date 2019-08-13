@@ -268,7 +268,6 @@ void Init_ExternalAcc()
     ExtAcc_InitialField[2][i] = DrivAmp * field_z[i] / density[i];
   }
 
-
   free(density);
   free(field_x);
   free(field_y);
