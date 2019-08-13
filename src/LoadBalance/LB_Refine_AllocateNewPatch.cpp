@@ -671,14 +671,14 @@ int AllocateSonPatch( const int FaLv, const int *Cr, const int PScale, const int
 
 
 // 2. allocate child patches and construct relation : child -> father
-   amr->pnew( SonLv, Cr[0],        Cr[1],        Cr[2],        FaPID, true, true );
-   amr->pnew( SonLv, Cr[0]+PScale, Cr[1],        Cr[2],        FaPID, true, true );
-   amr->pnew( SonLv, Cr[0],        Cr[1]+PScale, Cr[2],        FaPID, true, true );
-   amr->pnew( SonLv, Cr[0],        Cr[1],        Cr[2]+PScale, FaPID, true, true );
-   amr->pnew( SonLv, Cr[0]+PScale, Cr[1]+PScale, Cr[2],        FaPID, true, true );
-   amr->pnew( SonLv, Cr[0],        Cr[1]+PScale, Cr[2]+PScale, FaPID, true, true );
-   amr->pnew( SonLv, Cr[0]+PScale, Cr[1],        Cr[2]+PScale, FaPID, true, true );
-   amr->pnew( SonLv, Cr[0]+PScale, Cr[1]+PScale, Cr[2]+PScale, FaPID, true, true );
+   amr->pnew( SonLv, Cr[0],        Cr[1],        Cr[2],        FaPID, true, true, true );
+   amr->pnew( SonLv, Cr[0]+PScale, Cr[1],        Cr[2],        FaPID, true, true, true );
+   amr->pnew( SonLv, Cr[0],        Cr[1]+PScale, Cr[2],        FaPID, true, true, true );
+   amr->pnew( SonLv, Cr[0],        Cr[1],        Cr[2]+PScale, FaPID, true, true, true );
+   amr->pnew( SonLv, Cr[0]+PScale, Cr[1]+PScale, Cr[2],        FaPID, true, true, true );
+   amr->pnew( SonLv, Cr[0],        Cr[1]+PScale, Cr[2]+PScale, FaPID, true, true, true );
+   amr->pnew( SonLv, Cr[0]+PScale, Cr[1],        Cr[2]+PScale, FaPID, true, true, true );
+   amr->pnew( SonLv, Cr[0]+PScale, Cr[1]+PScale, Cr[2]+PScale, FaPID, true, true, true );
 
    amr->NPatchComma[SonLv][1] += 8;
 
@@ -760,9 +760,6 @@ int AllocateSonPatch( const int FaLv, const int *Cr, const int PScale, const int
       */
                                        Monotonicity[v] = EnsureMonotonicity_Yes;
 
-#     elif ( MODEL == MHD )
-#     warning : WAIT MHD !!!
-
 #     elif ( MODEL == ELBDM )
       if ( v != REAL  &&  v != IMAG )  Monotonicity[v] = EnsureMonotonicity_Yes;
       else                             Monotonicity[v] = EnsureMonotonicity_No;
@@ -839,8 +836,8 @@ int AllocateSonPatch( const int FaLv, const int *Cr, const int PScale, const int
 // 3.2.3 check minimum density and pressure
 // --> note that it's unnecessary to check negative passive scalars thanks to the monotonic interpolation
 // --> but we do renormalize passive scalars here
-#  if ( MODEL == HYDRO  ||  MODEL == MHD  ||  MODEL == ELBDM  ||  (defined DENS && NCOMP_PASSIVE>0) )
-#  if ( MODEL == HYDRO  ||  MODEL == MHD )
+#  if ( MODEL == HYDRO  ||  MODEL == ELBDM  ||  (defined DENS && NCOMP_PASSIVE>0) )
+#  if ( MODEL == HYDRO )
    const real  Gamma_m1 = GAMMA - (real)1.0;
    const real _Gamma_m1 = (real)1.0 / Gamma_m1;
 #  endif
@@ -869,28 +866,38 @@ int AllocateSonPatch( const int FaLv, const int *Cr, const int PScale, const int
          FData_Flu[DENS][k][j][i] = MIN_DENS;
       }
 
-#     if ( MODEL == HYDRO  ||  MODEL == MHD )
-#     ifdef DUAL_ENERGY
+
+#     if ( MODEL == HYDRO )
+//    compute magnetic energy
+#     ifdef MHD
+#     warning : WAIT MHD !!!
+      const real EngyB = NULL_REAL;
+#     else
+      const real EngyB = NULL_REAL;
+#     endif
+
 //    ensure consistency between pressure, total energy density, and the dual-energy variable
 //    --> here we ALWAYS use the dual-energy variable to correct the total energy density
 //    --> we achieve that by setting the dual-energy switch to an extremely larger number and ignore
 //        the runtime parameter DUAL_ENERGY_SWITCH here
+#     ifdef DUAL_ENERGY
       const bool CheckMinPres_Yes = true;
       const real UseEnpy2FixEngy  = HUGE_NUMBER;
       char dummy;    // we do not record the dual-energy status here
 
       Hydro_DualEnergyFix( FData_Flu[DENS][k][j][i], FData_Flu[MOMX][k][j][i], FData_Flu[MOMY][k][j][i],
                            FData_Flu[MOMZ][k][j][i], FData_Flu[ENGY][k][j][i], FData_Flu[ENPY][k][j][i],
-                           dummy, Gamma_m1, _Gamma_m1, CheckMinPres_Yes, MIN_PRES, UseEnpy2FixEngy );
+                           dummy, Gamma_m1, _Gamma_m1, CheckMinPres_Yes, MIN_PRES, UseEnpy2FixEngy, EngyB );
 
-#     else
+#     else // #ifdef DUAL_ENERGY
+
 //    check minimum pressure
       FData_Flu[ENGY][k][j][i]
          = Hydro_CheckMinPresInEngy( FData_Flu[DENS][k][j][i], FData_Flu[MOMX][k][j][i], FData_Flu[MOMY][k][j][i],
                                      FData_Flu[MOMZ][k][j][i], FData_Flu[ENGY][k][j][i],
-                                     Gamma_m1, _Gamma_m1, MIN_PRES );
+                                     Gamma_m1, _Gamma_m1, MIN_PRES, EngyB );
 #     endif // #ifdef DUAL_ENERGY ... else ...
-#     endif // #if ( MODEL == HYDRO  ||  MODEL == MHD )
+#     endif // #if ( MODEL == HYDRO )
 
 
 //    normalize passive scalars
@@ -907,7 +914,7 @@ int AllocateSonPatch( const int FaLv, const int *Cr, const int PScale, const int
       }
 #     endif
    } // i,j,k
-#  endif // #if ( MODEL == HYDRO  ||  MODEL == MHD  ||  MODEL == ELBDM )
+#  endif // #if ( MODEL == HYDRO  ||  MODEL == ELBDM )
 
 
 // 3.3 copy data from FData_XXX to patch pointers

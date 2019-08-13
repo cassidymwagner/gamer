@@ -52,8 +52,6 @@ void Aux_TakeNote()
 //    a. options for all models
 #     if   ( MODEL == HYDRO )
       fprintf( Note, "MODEL                           HYDRO\n" );
-#     elif ( MODEL == MHD )
-      fprintf( Note, "MODEL                           MHD\n" );
 #     elif ( MODEL == ELBDM )
       fprintf( Note, "MODEL                           ELBDM\n" );
 #     elif ( MODEL == PAR_ONLY )
@@ -145,6 +143,8 @@ void Aux_TakeNote()
       fprintf( Note, "RSOLVER                         HLLE\n" );
 #     elif ( RSOLVER == HLLC )
       fprintf( Note, "RSOLVER                         HLLC\n" );
+#     elif ( RSOLVER == HLLD )
+      fprintf( Note, "RSOLVER                         HLLD\n" );
 #     elif ( RSOLVER == NONE )
       fprintf( Note, "RSOLVER                         NONE\n" );
 #     else
@@ -161,11 +161,13 @@ void Aux_TakeNote()
       fprintf( Note, "DUAL_ENERGY                     UNKNOWN\n" );
 #     endif
 
-//    c. options in MHD
-#     elif ( MODEL == MHD )
-#     warning : WAIT MHD !!!
+#     ifdef MHD
+      fprintf( Note, "MHD                             ON\n" );
+#     else
+      fprintf( Note, "MHD                             OFF\n" );
+#     endif
 
-//    d. options in ELBDM
+//    c. options in ELBDM
 #     elif ( MODEL == ELBDM )
 
 #     ifdef CONSERVE_MASS
@@ -190,7 +192,7 @@ void Aux_TakeNote()
 #     error : ERROR : unsupported MODEL !!
 #     endif // MODEL
 
-//    e. options in PARTICLE
+//    d. options in PARTICLE
 #     ifdef PARTICLE
 #     ifdef STORE_PAR_ACC
       fprintf( Note, "STORE_PAR_ACC                   ON\n" );
@@ -346,6 +348,8 @@ void Aux_TakeNote()
       fprintf( Note, "CHECK_INTERMEDIATE              HLLE\n" );
 #     elif ( CHECK_INTERMEDIATE == HLLC )
       fprintf( Note, "CHECK_INTERMEDIATE              HLLC\n" );
+#     elif ( CHECK_INTERMEDIATE == HLLD )
+      fprintf( Note, "CHECK_INTERMEDIATE              HLLD\n" );
 #     elif ( CHECK_INTERMEDIATE == NONE )
       fprintf( Note, "CHECK_INTERMEDIATE              OFF\n" );
 #     else
@@ -364,8 +368,13 @@ void Aux_TakeNote()
       fprintf( Note, "HLL_INCLUDE_ALL_WAVES           OFF\n" );
 #     endif
 
-#     elif ( MODEL == MHD )
-#     warning : WAIT MHD !!!
+#     ifdef MHD
+#     ifdef EULERY
+      fprintf( Note, "EULERY                          ON\n" );
+#     else
+      fprintf( Note, "EULERY                          OFF\n" );
+#     endif
+#     endif // #ifdef MHD
 
 #     elif ( MODEL == ELBDM )
 
@@ -446,17 +455,25 @@ void Aux_TakeNote()
 #     ifdef GRAVITY
       fprintf( Note, "#define GRA_NIN                 %d\n",      GRA_NIN             );
 #     endif
+#     ifdef MHD
+      fprintf( Note, "#define NCOMP_MAG               %d\n",      NCOMP_MAG           );
+      fprintf( Note, "#define NCOMP_ELE               %d\n",      NCOMP_ELE           );
+#     endif
       fprintf( Note, "#define PATCH_SIZE              %d\n",      PATCH_SIZE          );
       fprintf( Note, "#define MAX_PATCH               %d\n",      MAX_PATCH           );
       fprintf( Note, "#define NLEVEL                  %d\n",      NLEVEL              );
       fprintf( Note, "\n" );
       fprintf( Note, "#define FLU_GHOST_SIZE          %d\n",      FLU_GHOST_SIZE      );
+#     if ( MODEL == HYDRO )
+      fprintf( Note, "#define LR_GHOST_SIZE           %d\n",      LR_GHOST_SIZE       );
+#     endif
 #     ifdef GRAVITY
       fprintf( Note, "#define POT_GHOST_SIZE          %d\n",      POT_GHOST_SIZE      );
       fprintf( Note, "#define RHO_GHOST_SIZE          %d\n",      RHO_GHOST_SIZE      );
       fprintf( Note, "#define GRA_GHOST_SIZE          %d\n",      GRA_GHOST_SIZE      );
 #     ifdef UNSPLIT_GRAVITY
-      fprintf( Note, "#define USG_GHOST_SIZE          %d\n",      USG_GHOST_SIZE      );
+      fprintf( Note, "#define USG_GHOST_SIZE_F        %d\n",      USG_GHOST_SIZE_F    );
+      fprintf( Note, "#define USG_GHOST_SIZE_G        %d\n",      USG_GHOST_SIZE_G    );
 #     endif
 #     ifdef PARTICLE
       fprintf( Note, "#define RHOEXT_GHOST_SIZE       %d\n",      RHOEXT_GHOST_SIZE   );
@@ -558,7 +575,10 @@ void Aux_TakeNote()
       fprintf( Note, "UNIT_D (mass density)           %20.14e rho_bg     (*)\n", UNIT_D/Current_Matter_Density );
       fprintf( Note, "                              = %20.14e g/cm^3     (*)\n", UNIT_D                        );
       fprintf( Note, "UNIT_E (energy)                 %20.14e g*cm^2/s^2 (*)\n", UNIT_E                        );
-      fprintf( Note, "UNIT_P (energy density)         %20.14e g/cm/s^2   (*)\n", UNIT_P                        ); }
+      fprintf( Note, "UNIT_P (energy density)         %20.14e g/cm/s^2   (*)\n", UNIT_P                        );
+#     ifdef MHD
+#     error : ERROR : MHD is not supported here !!!
+#     endif
 
 #     else
 
@@ -568,8 +588,12 @@ void Aux_TakeNote()
       fprintf( Note, "UNIT_V                          %20.14e cm/s\n",           UNIT_V                        );
       fprintf( Note, "UNIT_D                          %20.14e g/cm^3\n",         UNIT_D                        );
       fprintf( Note, "UNIT_E (energy)                 %20.14e g*cm^2/s^2\n",     UNIT_E                        );
-      fprintf( Note, "UNIT_P (energy density)         %20.14e g/cm/s^2\n",       UNIT_P                        ); }
+      fprintf( Note, "UNIT_P (energy density)         %20.14e g/cm/s^2\n",       UNIT_P                        );
+#     ifdef MHD
+      fprintf( Note, "UNIT_B (magnetic field)         %20.14e gauss\n",          UNIT_B                        );
+#     endif
 #     endif // #ifdef COMOVING ... else ...
+      }
 
       fprintf( Note, "***********************************************************************************\n" );
       fprintf( Note, "\n\n");
@@ -669,23 +693,22 @@ void Aux_TakeNote()
       fprintf( Note, "MAX_LEVEL                       %d\n",      MAX_LEVEL                 );
       fprintf( Note, "OPT__FLAG_RHO                   %d\n",      OPT__FLAG_RHO             );
       fprintf( Note, "OPT__FLAG_RHO_GRADIENT          %d\n",      OPT__FLAG_RHO_GRADIENT    );
-#     if   ( MODEL == HYDRO )
+#     if ( MODEL == HYDRO )
       fprintf( Note, "OPT__FLAG_PRES_GRADIENT         %d\n",      OPT__FLAG_PRES_GRADIENT   );
       fprintf( Note, "OPT__FLAG_VORTICITY             %d\n",      OPT__FLAG_VORTICITY       );
       fprintf( Note, "OPT__FLAG_JEANS                 %d\n",      OPT__FLAG_JEANS           );
-#     elif ( MODEL == MHD )
-#     warning : WAIT MHD !!!
+#     ifdef MHD
+      fprintf( Note, "OPT__FLAG_CURRENT               %d\n",      OPT__FLAG_CURRENT         );
+#     endif
 #     endif
 #     if ( MODEL == ELBDM )
       fprintf( Note, "OPT__FLAG_ENGY_DENSITY          %d\n",      OPT__FLAG_ENGY_DENSITY    );
 #     endif
       fprintf( Note, "OPT__FLAG_LOHNER_DENS           %d\n",      OPT__FLAG_LOHNER_DENS     );
-#     if   ( MODEL == HYDRO )
+#     if ( MODEL == HYDRO )
       fprintf( Note, "OPT__FLAG_LOHNER_ENGY           %d\n",      OPT__FLAG_LOHNER_ENGY     );
       fprintf( Note, "OPT__FLAG_LOHNER_PRES           %d\n",      OPT__FLAG_LOHNER_PRES     );
       fprintf( Note, "OPT__FLAG_LOHNER_TEMP           %d\n",      OPT__FLAG_LOHNER_TEMP     );
-#     elif ( MODEL == MHD )
-#     warning : WAIT MHD !!!
 #     endif
       fprintf( Note, "OPT__FLAG_LOHNER_FORM           %s\n",      (OPT__FLAG_LOHNER_FORM==LOHNER_FLASH1   ) ? "LOHNER_FLASH1"    :
                                                                   (OPT__FLAG_LOHNER_FORM==LOHNER_FLASH2   ) ? "LOHNER_FLASH2"    :
@@ -794,10 +817,9 @@ void Aux_TakeNote()
       fprintf( Note, "OPT__1ST_FLUX_CORR_SCHEME       %s\n",      ( OPT__1ST_FLUX_CORR_SCHEME == RSOLVER_1ST_ROE  ) ? "RSOLVER_1ST_ROE"  :
                                                                   ( OPT__1ST_FLUX_CORR_SCHEME == RSOLVER_1ST_HLLC ) ? "RSOLVER_1ST_HLLC" :
                                                                   ( OPT__1ST_FLUX_CORR_SCHEME == RSOLVER_1ST_HLLE ) ? "RSOLVER_1ST_HLLE" :
+                                                                  ( OPT__1ST_FLUX_CORR_SCHEME == RSOLVER_1ST_HLLD ) ? "RSOLVER_1ST_HLLD" :
                                                                   ( OPT__1ST_FLUX_CORR_SCHEME == RSOLVER_1ST_NONE ) ? "NONE"             :
                                                                                                                 "UNKNOWN" );
-#     elif ( MODEL == MHD )
-#     warning : WAIT MHD !!!
 
 #     elif ( MODEL == ELBDM )
       if ( OPT__UNIT ) {
@@ -841,6 +863,9 @@ void Aux_TakeNote()
       fprintf( Note, "FLU_GPU_NPGROUP                 %d\n",      FLU_GPU_NPGROUP          );
       fprintf( Note, "GPU_NSTREAM                     %d\n",      GPU_NSTREAM              );
       fprintf( Note, "OPT__FIXUP_FLUX                 %d\n",      OPT__FIXUP_FLUX          );
+#     ifdef MHD
+      fprintf( Note, "OPT__FIXUP_ELECTRIC             %d\n",      OPT__FIXUP_ELECTRIC      );
+#     endif
       fprintf( Note, "OPT__FIXUP_RESTRICT             %d\n",      OPT__FIXUP_RESTRICT      );
       fprintf( Note, "OPT__CORR_AFTER_ALL_SYNC        %d\n",      OPT__CORR_AFTER_ALL_SYNC );
       fprintf( Note, "OPT__NORMALIZE_PASSIVE          %d\n",      OPT__NORMALIZE_PASSIVE   );
@@ -855,10 +880,10 @@ void Aux_TakeNote()
 
       fprintf( Note, "OPT__OVERLAP_MPI                %d\n",      OPT__OVERLAP_MPI         );
       fprintf( Note, "OPT__RESET_FLUID                %d\n",      OPT__RESET_FLUID         );
-#     if ( MODEL == HYDRO  ||  MODEL == MHD  ||  MODEL == ELBDM )
+#     if ( MODEL == HYDRO  ||  MODEL == ELBDM )
       fprintf( Note, "MIN_DENS                        %13.7e\n",  MIN_DENS                 );
 #     endif
-#     if ( MODEL == HYDRO  ||  MODEL == MHD )
+#     if ( MODEL == HYDRO )
       fprintf( Note, "MIN_PRES                        %13.7e\n",  MIN_PRES                 );
       fprintf( Note, "JEANS_MIN_PRES                  %d\n",      JEANS_MIN_PRES           );
       if ( JEANS_MIN_PRES ) {
@@ -891,22 +916,23 @@ void Aux_TakeNote()
 #     ifdef GRAVITY
       fprintf( Note, "Parameters of Poisson and Gravity Solvers\n" );
       fprintf( Note, "***********************************************************************************\n" );
-      fprintf( Note, "NEWTON_G                        %13.7e\n",  NEWTON_G             );
+      fprintf( Note, "NEWTON_G                        %13.7e\n",  NEWTON_G                );
 #     if   ( POT_SCHEME == SOR )
-      fprintf( Note, "SOR_OMEGA                       %13.7e\n",  SOR_OMEGA            );
-      fprintf( Note, "SOR_MAX_ITER                    %d\n",      SOR_MAX_ITER         );
-      fprintf( Note, "SOR_MIN_ITER                    %d\n",      SOR_MIN_ITER         );
+      fprintf( Note, "SOR_OMEGA                       %13.7e\n",  SOR_OMEGA               );
+      fprintf( Note, "SOR_MAX_ITER                    %d\n",      SOR_MAX_ITER            );
+      fprintf( Note, "SOR_MIN_ITER                    %d\n",      SOR_MIN_ITER            );
 #     elif ( POT_SCHEME == MG )
-      fprintf( Note, "MG_MAX_ITER                     %d\n",      MG_MAX_ITER          );
-      fprintf( Note, "MG_NPRE_SMOOTH                  %d\n",      MG_NPRE_SMOOTH       );
-      fprintf( Note, "MG_NPOST_SMOOTH                 %d\n",      MG_NPOST_SMOOTH      );
-      fprintf( Note, "MG_TOLERATED_ERROR              %13.7e\n",  MG_TOLERATED_ERROR   );
+      fprintf( Note, "MG_MAX_ITER                     %d\n",      MG_MAX_ITER             );
+      fprintf( Note, "MG_NPRE_SMOOTH                  %d\n",      MG_NPRE_SMOOTH          );
+      fprintf( Note, "MG_NPOST_SMOOTH                 %d\n",      MG_NPOST_SMOOTH         );
+      fprintf( Note, "MG_TOLERATED_ERROR              %13.7e\n",  MG_TOLERATED_ERROR      );
 #     endif
-      fprintf( Note, "POT_GPU_NPGROUP                 %d\n",      POT_GPU_NPGROUP      );
-      fprintf( Note, "OPT__GRA_P5_GRADIENT            %d\n",      OPT__GRA_P5_GRADIENT );
-      fprintf( Note, "OPT__GRAVITY_TYPE               %d\n",      OPT__GRAVITY_TYPE    );
-      fprintf( Note, "OPT__EXTERNAL_POT               %d\n",      OPT__EXTERNAL_POT    );
-      fprintf( Note, "AveDensity_Init                 %13.7e\n",  AveDensity_Init      );
+      fprintf( Note, "POT_GPU_NPGROUP                 %d\n",      POT_GPU_NPGROUP         );
+      fprintf( Note, "OPT__GRA_P5_GRADIENT            %d\n",      OPT__GRA_P5_GRADIENT    );
+      fprintf( Note, "OPT__GRAVITY_TYPE               %d\n",      OPT__GRAVITY_TYPE       );
+      fprintf( Note, "OPT__EXTERNAL_POT               %d\n",      OPT__EXTERNAL_POT       );
+      fprintf( Note, "OPT__GRAVITY_EXTRA_MASS         %d\n",      OPT__GRAVITY_EXTRA_MASS );
+      fprintf( Note, "AveDensity_Init                 %13.7e\n",  AveDensity_Init         );
       fprintf( Note, "***********************************************************************************\n" );
       fprintf( Note, "\n\n");
 #     endif // #ifdef GRAVITY
@@ -947,6 +973,16 @@ void Aux_TakeNote()
                                                                   ( OPT__FLU_INT_SCHEME == INT_CQUAR    ) ? "CQUAR"    :
                                                                   ( OPT__FLU_INT_SCHEME == INT_QUAR     ) ? "QUAR"     :
                                                                                                             "UNKNOWN" );
+#     ifdef MHD
+      fprintf( Note, "OPT__MAG_INT_SCHEME             %s\n",      ( OPT__MAG_INT_SCHEME == INT_MINMOD3D ) ? "MINMOD3D" :
+                                                                  ( OPT__MAG_INT_SCHEME == INT_MINMOD1D ) ? "MINMOD1D" :
+                                                                  ( OPT__MAG_INT_SCHEME == INT_VANLEER  ) ? "VANLEER"  :
+                                                                  ( OPT__MAG_INT_SCHEME == INT_CQUAD    ) ? "CQUAD"    :
+                                                                  ( OPT__MAG_INT_SCHEME == INT_QUAD     ) ? "QUAD"     :
+                                                                  ( OPT__MAG_INT_SCHEME == INT_CQUAR    ) ? "CQUAR"    :
+                                                                  ( OPT__MAG_INT_SCHEME == INT_QUAR     ) ? "QUAR"     :
+                                                                                                            "UNKNOWN" );
+#     endif
 #     ifdef GRAVITY
       fprintf( Note, "OPT__POT_INT_SCHEME             %s\n",      ( OPT__POT_INT_SCHEME == INT_MINMOD3D ) ? "MINMOD3D" :
                                                                   ( OPT__POT_INT_SCHEME == INT_MINMOD1D ) ? "MINMOD1D" :
@@ -981,6 +1017,16 @@ void Aux_TakeNote()
                                                                ( OPT__REF_FLU_INT_SCHEME == INT_CQUAR    ) ? "CQUAR"    :
                                                                ( OPT__REF_FLU_INT_SCHEME == INT_QUAR     ) ? "QUAR"     :
                                                                                                              "UNKNOWN" );
+#     ifdef MHD
+      fprintf( Note, "OPT__REF_MAG_INT_SCHEME         %s\n",   ( OPT__REF_MAG_INT_SCHEME == INT_MINMOD3D ) ? "MINMOD3D" :
+                                                               ( OPT__REF_MAG_INT_SCHEME == INT_MINMOD1D ) ? "MINMOD1D" :
+                                                               ( OPT__REF_MAG_INT_SCHEME == INT_VANLEER  ) ? "VANLEER"  :
+                                                               ( OPT__REF_MAG_INT_SCHEME == INT_CQUAD    ) ? "CQUAD"    :
+                                                               ( OPT__REF_MAG_INT_SCHEME == INT_QUAD     ) ? "QUAD"     :
+                                                               ( OPT__REF_MAG_INT_SCHEME == INT_CQUAR    ) ? "CQUAR"    :
+                                                               ( OPT__REF_MAG_INT_SCHEME == INT_QUAR     ) ? "QUAR"     :
+                                                                                                             "UNKNOWN" );
+#     endif
 #     ifdef GRAVITY
       fprintf( Note, "OPT__REF_POT_INT_SCHEME         %s\n",   ( OPT__REF_POT_INT_SCHEME == INT_MINMOD3D ) ? "MINMOD3D" :
                                                                ( OPT__REF_POT_INT_SCHEME == INT_MINMOD1D ) ? "MINMOD1D" :
@@ -1012,6 +1058,9 @@ void Aux_TakeNote()
 #     endif
 #     ifdef PARTICLE
       fprintf( Note, "OPT__OUTPUT_PAR_DENS            %d\n",      OPT__OUTPUT_PAR_DENS );
+#     endif
+#     ifdef MHD
+      fprintf( Note, "OPT__OUTPUT_CC_MAG              %d\n",      OPT__OUTPUT_CC_MAG   );
 #     endif
       fprintf( Note, "OPT__OUTPUT_MODE                %d\n",      OPT__OUTPUT_MODE     );
       fprintf( Note, "OUTPUT_STEP                     %d\n",      OUTPUT_STEP          );
@@ -1064,14 +1113,16 @@ void Aux_TakeNote()
       fprintf( Note, "OPT__CK_FINITE                  %d\n",      OPT__CK_FINITE            );
       fprintf( Note, "OPT__CK_PATCH_ALLOCATE          %d\n",      OPT__CK_PATCH_ALLOCATE    );
       fprintf( Note, "OPT__CK_FLUX_ALLOCATE           %d\n",      OPT__CK_FLUX_ALLOCATE     );
-#     if   ( MODEL == HYDRO )
+#     if ( MODEL == HYDRO )
       fprintf( Note, "OPT__CK_NEGATIVE                %d\n",      OPT__CK_NEGATIVE          );
-#     elif ( MODEL == MHD )
-#     warning : WAIT MHD !!!
-#     endif // MODEL
+#     endif
       fprintf( Note, "OPT__CK_MEMFREE                 %13.7e\n",  OPT__CK_MEMFREE           );
 #     ifdef PARTICLE
       fprintf( Note, "OPT__CK_PARTICLE                %d\n",      OPT__CK_PARTICLE          );
+#     endif
+#     ifdef MHD
+      fprintf( Note, "OPT__CK_INTERFACE_B             %d\n",      OPT__CK_INTERFACE_B       );
+      fprintf( Note, "OPT__CK_DIVERGENCE_B            %d\n",      OPT__CK_DIVERGENCE_B      );
 #     endif
       fprintf( Note, "***********************************************************************************\n" );
       fprintf( Note, "\n\n");
@@ -1128,9 +1179,19 @@ void Aux_TakeNote()
          fprintf( Note, "***********************************************************************************\n" );
          fprintf( Note, "\n\n");
       }
-#     elif ( MODEL == MHD )
-#     warning : WAIT MHD !!!
+
+#     ifdef MHD
+      if ( OPT__FLAG_CURRENT )
+      {
+         fprintf( Note, "Flag Criterion (Current Density in MHD)\n" );
+         fprintf( Note, "***********************************************************************************\n" );
+         fprintf( Note, "  Level             Current\n" );
+         for (int lv=0; lv<MAX_LEVEL; lv++)  fprintf( Note, "%7d%20.7e\n", lv, FlagTable_Current[lv] );
+         fprintf( Note, "***********************************************************************************\n" );
+         fprintf( Note, "\n\n");
+      }
 #     endif
+#     endif // #if ( MODEL == HYDRO )
 
 #     if ( MODEL == ELBDM )
       if ( OPT__FLAG_ENGY_DENSITY )
@@ -1145,7 +1206,7 @@ void Aux_TakeNote()
       }
 #     endif
 
-#     if   ( MODEL == HYDRO  ||  MODEL == MHD )
+#     if   ( MODEL == HYDRO )
       if ( OPT__FLAG_LOHNER_DENS || OPT__FLAG_LOHNER_ENGY || OPT__FLAG_LOHNER_PRES || OPT__FLAG_LOHNER_TEMP )
 #     elif ( MODEL == ELBDM )
       if ( OPT__FLAG_LOHNER_DENS )
