@@ -36,7 +36,7 @@ COMPILE_VERBOSE := 0
 SIMU_OPTION += -DMODEL=HYDRO
 
 # enable gravity
-#SIMU_OPTION += -DGRAVITY
+SIMU_OPTION += -DGRAVITY
 
 # enable particles
 # --> must enable GRAVITY
@@ -65,7 +65,7 @@ SIMU_OPTION += -DLR_SCHEME=PPM
 # --> pure hydro: EXACT/ROE/HLLE/HLLC(*); MHD: ROE/HLLE/HLLD(*);
 #     		  (recommended solvers are highlighted by *)
 # --> useless for RTVD
-SIMU_OPTION += -DRSOLVER=ROE
+SIMU_OPTION += -DRSOLVER=HLLD
 
 # dual energy formalism: DE_ENPY/DE_EINT (evolve entropy or internal energy)
 # --> DE_EINT is not supported yet; useless for RTVD
@@ -77,7 +77,7 @@ SIMU_OPTION += -DRSOLVER=ROE
 SIMU_OPTION += -DNCOMP_PASSIVE_USER=0
 
 # magnetohydrodynamics
-#SIMU_OPTION += -DMHD
+SIMU_OPTION += -DMHD
 
 
 # (b-2) ELBDM options
@@ -190,7 +190,7 @@ SIMU_OPTION += -DOPENMP
 #SIMU_OPTION += -DLAOHU
 
 # support HDF5 format
-#SIMU_OPTION += -DSUPPORT_HDF5
+SIMU_OPTION += -DSUPPORT_HDF5
 
 # support GNU scientific library
 #SIMU_OPTION += -DSUPPORT_GSL
@@ -275,9 +275,9 @@ endif
 
 # template
 CUDA_PATH    :=
-FFTW_PATH    :=
+FFTW_PATH    := /home/cwagner4/applications/
 MPI_PATH     :=
-HDF5_PATH    :=
+HDF5_PATH    := /usr/include/
 GRACKLE_PATH :=
 GSL_PATH     :=
 LIBYT_PATH   :=

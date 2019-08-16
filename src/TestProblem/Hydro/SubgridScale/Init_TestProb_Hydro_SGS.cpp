@@ -213,6 +213,88 @@ void SetGridIC( real fluid[], const double x, const double y, const double z, co
    if ( r <= SphCol_Radius )  fluid[DENS] *= ( 1.0 + SphCol_Dens_Delta );
 
 } // FUNCTION : SetGridIC
+
+
+
+#ifdef MHD
+//-------------------------------------------------------------------------------------------------------
+// Function    :  SetBFieldIC
+// Description :  Set the problem-specific initial condition of magnetic field
+//
+// Note        :  1. This function will be invoked by multiple OpenMP threads when OPENMP is enabled
+//                   (unless OPT__INIT_GRID_WITH_OMP is disabled)
+//                   --> Please ensure that everything here is thread-safe
+//
+// Parameter   :  magnetic : Array to store the output magnetic field
+//                x/y/z    : Target physical coordinates
+//                Time     : Target physical time
+//                lv       : Target refinement level
+//                AuxArray : Auxiliary array
+//
+// Return      :  magnetic
+//-------------------------------------------------------------------------------------------------------
+void SetBFieldIC( real magnetic[], const double x, const double y, const double z, const double Time,
+                  const int lv, double AuxArray[] )
+{
+
+   int dim = NX0[0];
+
+   size_t nread = 0;
+   FILE *bin_data = fopen("UM_IC", "r");
+
+   float *mag_x= (float *) calloc(dim*dim*dim, sizeof(float));
+   nread = fread(mag_x, sizeof(float), (dim+1)*dim*dim, bin_data);
+
+   float *mag_y= (float *) calloc(dim*dim*dim, sizeof(float));
+   nread = fread(mag_y, sizeof(float), dim*(dim+1)*dim, bin_data);
+
+   float *mag_z= (float *) calloc(dim*dim*dim, sizeof(float));
+   nread = fread(mag_z, sizeof(float), dim*dim*(dim+1), bin_data);
+ 
+   double *mag_fields[3] = {NULL, NULL, NULL}; 
+  
+  for( int i = 0; i < (dim+1)*dim*dim; i++){
+  
+      mag_fields[0][i] = mag_x[i];
+   }
+ 
+   for( int i = 0; i < dim*(dim+1)*dim; i++){
+  
+      mag_fields[1][i] = mag_y[i];
+   }
+ 
+   for( int i = 0; i < dim*dim*(dim+1); i++){
+  
+      mag_fields[2][i] = mag_z[i];
+   }
+
+   // Unravel the indexing
+
+   int m_temp, ix, iy, iz;
+   
+   ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * (dim+1));
+   iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * dim);
+   iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * dim);
+   m_temp = (iz + dim * (iy + dim * ix));
+
+   magnetic[MAGX] = mag_fields[0][m_temp];
+   
+   ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * dim);
+   iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * (dim+1));
+   iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * dim);
+   m_temp = (iz + dim * (iy + dim * ix));
+   
+   magnetic[MAGY] = mag_fields[1][m_temp];
+   
+   ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * dim);
+   iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * dim);
+   iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * (dim+1));
+   m_temp = (iz + dim * (iy + dim * ix));
+
+   magnetic[MAGZ] = mag_fields[2][m_temp];
+
+} // FUNCTION : SetBFieldIC
+#endif // #ifdef MHD
 #endif // #if ( MODEL == HYDRO )
 
 
@@ -313,17 +395,20 @@ void Init_TestProb_Hydro_SGS()
 
 
 // set the function pointers of various problem-specific routines
-   Init_Function_User_Ptr   = SetGridIC;
-   Output_User_Ptr          = NULL;
-   Flag_User_Ptr            = NULL;
-   Mis_GetTimeStep_User_Ptr = NULL;
-   Aux_Record_User_Ptr      = NULL;
-   BC_User_Ptr              = NULL;
-   Flu_ResetByUser_Func_Ptr = NULL;
-   End_User_Ptr             = NULL;
+   Init_Function_User_Ptr         = SetGridIC;
+#  ifdef MHD
+   Init_Function_BField_User_Ptr  = SetBFieldIC;
+#  endif
+   Output_User_Ptr                = NULL;
+   Flag_User_Ptr                  = NULL;
+   Mis_GetTimeStep_User_Ptr       = NULL;
+   Aux_Record_User_Ptr            = NULL;
+   BC_User_Ptr                    = NULL;
+   Flu_ResetByUser_Func_Ptr       = NULL;
+   End_User_Ptr                   = NULL;
 #  ifdef GRAVITY
-   Init_ExternalAcc_Ptr     = Init_ExternalAcc;
-   Init_ExternalPot_Ptr     = NULL;
+   Init_ExternalAcc_Ptr          = Init_ExternalAcc;
+   Init_ExternalPot_Ptr          = NULL;
 #  endif
 #  endif // #if ( MODEL == HYDRO )
 
