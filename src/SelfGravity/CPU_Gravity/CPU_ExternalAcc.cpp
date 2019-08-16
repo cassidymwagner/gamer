@@ -12,7 +12,7 @@
 // soften length implementation
 //#  define SOFTEN_PLUMMER
 //#  define SOFTEN_RUFFERT
-#   define DRIV_TURB
+//#   define DRIV_TURB
 
 #  if   (defined DRIV_TURB)
 extern double* ExtAcc_InitialField[3];
