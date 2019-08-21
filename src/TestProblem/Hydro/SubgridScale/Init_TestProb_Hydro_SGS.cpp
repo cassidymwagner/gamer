@@ -6,7 +6,7 @@
 // =====================================================================================================
 #include "CUPOT.h"
 
-double *ExtAcc_InitialField[3] = {NULL, NULL, NULL}; 
+double *ExtAcc_InitialField[6] = {NULL, NULL, NULL, NULL, NULL, NULL}; 
 #endif
 
 // ====================================================================================================
@@ -236,37 +236,46 @@ void SetGridIC( real fluid[], const double x, const double y, const double z, co
 void SetBFieldIC( real magnetic[], const double x, const double y, const double z, const double Time,
                   const int lv, double AuxArray[] )
 {
-
-   int dim = NX0[0];
+   
+   int dim = NX0[0]; 
 
    size_t nread = 0;
    FILE *bin_data = fopen("UM_IC", "r");
 
-   float *mag_x= (float *) calloc(dim*dim*dim, sizeof(float));
+   float *mag_x = (float *) calloc((dim+1)*dim*dim, sizeof(float));
    nread = fread(mag_x, sizeof(float), (dim+1)*dim*dim, bin_data);
 
-   float *mag_y= (float *) calloc(dim*dim*dim, sizeof(float));
-   nread = fread(mag_y, sizeof(float), dim*(dim+1)*dim, bin_data);
+   float *mag_y= (float *) calloc((dim+1)*dim*dim, sizeof(float));
+   nread = fread(mag_y, sizeof(float), (dim+1)*dim*dim, bin_data);
 
-   float *mag_z= (float *) calloc(dim*dim*dim, sizeof(float));
-   nread = fread(mag_z, sizeof(float), dim*dim*(dim+1), bin_data);
+   float *mag_z= (float *) calloc((dim+1)*dim*dim, sizeof(float));
+   nread = fread(mag_z, sizeof(float), (dim+1)*dim*dim, bin_data);
  
-   double *mag_fields[3] = {NULL, NULL, NULL}; 
-  
-  for( int i = 0; i < (dim+1)*dim*dim; i++){
-  
-      mag_fields[0][i] = mag_x[i];
+   if (ExtAcc_InitialField[3] == NULL) { 
+     ExtAcc_InitialField[3] = (double*)calloc((dim+1)*dim*dim, sizeof(double));
    }
- 
-   for( int i = 0; i < dim*(dim+1)*dim; i++){
-  
-      mag_fields[1][i] = mag_y[i];
+
+   if (ExtAcc_InitialField[4] == NULL) { 
+     ExtAcc_InitialField[4] = (double*)calloc((dim+1)*dim*dim, sizeof(double));
+     Aux_Message( stdout, "ExtAcc 4 allocated properly \n", __FUNCTION__ );
    }
- 
-   for( int i = 0; i < dim*dim*(dim+1); i++){
-  
-      mag_fields[2][i] = mag_z[i];
+
+
+   if (ExtAcc_InitialField[5] == NULL) { 
+     ExtAcc_InitialField[5] = (double*)calloc((dim+1)*dim*dim, sizeof(double));
+   } 
+
+   for( int i = 0; i < (dim+1)*dim*dim; i++){
+
+     ExtAcc_InitialField[3][i] = mag_x[i];
+     ExtAcc_InitialField[4][i] = mag_y[i];
+     ExtAcc_InitialField[5][i] = mag_z[i];
    }
+
+    free(mag_x);
+    free(mag_y);
+    free(mag_z);
+
 
    // Unravel the indexing
 
@@ -276,24 +285,25 @@ void SetBFieldIC( real magnetic[], const double x, const double y, const double 
    iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * dim);
    iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * dim);
    m_temp = (iz + dim * (iy + dim * ix));
+   
 
-   magnetic[MAGX] = mag_fields[0][m_temp];
+   magnetic[MAGX] = ExtAcc_InitialField[3][m_temp];
    
    ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * dim);
    iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * (dim+1));
    iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * dim);
    m_temp = (iz + dim * (iy + dim * ix));
    
-   magnetic[MAGY] = mag_fields[1][m_temp];
+   magnetic[MAGY] = ExtAcc_InitialField[4][m_temp];
    
    ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * dim);
    iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * dim);
    iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * (dim+1));
    m_temp = (iz + dim * (iy + dim * ix));
 
-   magnetic[MAGZ] = mag_fields[2][m_temp];
+   magnetic[MAGZ] = ExtAcc_InitialField[5][m_temp];
 
-} // FUNCTION : SetBFieldIC
+ } // FUNCTION : SetBFieldIC
 #endif // #ifdef MHD
 #endif // #if ( MODEL == HYDRO )
 
@@ -313,6 +323,8 @@ void SetBFieldIC( real magnetic[], const double x, const double y, const double 
 //-------------------------------------------------------------------------------------------------------
 void Init_ExternalAcc()
 {
+
+  Aux_Message(stdout, "Init_ExternalAcc is called!");
 
   int dim = NX0[0];
 
@@ -343,6 +355,7 @@ void Init_ExternalAcc()
     ExtAcc_InitialField[2] = (double*)calloc(dim*dim*dim, sizeof(double));
   }
 
+  
   for( int i = 0; i < dim*dim*dim; i++){
 
     ExtAcc_InitialField[0][i] = DrivAmp * field_x[i] / density[i];
@@ -350,11 +363,13 @@ void Init_ExternalAcc()
     ExtAcc_InitialField[2][i] = DrivAmp * field_z[i] / density[i];
   }
 
+  
+
   free(density);
   free(field_x);
   free(field_y);
   free(field_z);
-
+ 
   
   //free(ExtAcc_InitialField[0]);
   //free(ExtAcc_InitialField[1]);
