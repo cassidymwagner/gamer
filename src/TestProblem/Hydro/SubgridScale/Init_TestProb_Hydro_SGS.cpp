@@ -242,67 +242,70 @@ void SetBFieldIC( real magnetic[], const double x, const double y, const double 
    size_t nread = 0;
    FILE *bin_data = fopen("UM_IC", "r");
 
-   float *mag_x = (float *) calloc((dim+1)*dim*dim, sizeof(float));
-   nread = fread(mag_x, sizeof(float), (dim+1)*dim*dim, bin_data);
+   if (ExtAcc_InitialField[3] == NULL) {
 
-   float *mag_y= (float *) calloc((dim+1)*dim*dim, sizeof(float));
-   nread = fread(mag_y, sizeof(float), (dim+1)*dim*dim, bin_data);
+     float *mag_x = (float *) calloc((dim+1)*dim*dim, sizeof(float));
+     nread = fread(mag_x, sizeof(float), (dim+1)*dim*dim, bin_data);
+     Aux_Message( stdout, "fread for magx \n" );
 
-   float *mag_z= (float *) calloc((dim+1)*dim*dim, sizeof(float));
-   nread = fread(mag_z, sizeof(float), (dim+1)*dim*dim, bin_data);
+     float *mag_y= (float *) calloc((dim+1)*dim*dim, sizeof(float));
+     nread = fread(mag_y, sizeof(float), (dim+1)*dim*dim, bin_data);
+     Aux_Message( stdout, "fread for magy \n" );
+
+     float *mag_z= (float *) calloc((dim+1)*dim*dim, sizeof(float));
+     nread = fread(mag_z, sizeof(float), (dim+1)*dim*dim, bin_data);
+     Aux_Message( stdout, "fread for magz \n" );
  
-   if (ExtAcc_InitialField[3] == NULL) { 
      ExtAcc_InitialField[3] = (double*)calloc((dim+1)*dim*dim, sizeof(double));
-   }
 
-   if (ExtAcc_InitialField[4] == NULL) { 
      ExtAcc_InitialField[4] = (double*)calloc((dim+1)*dim*dim, sizeof(double));
      Aux_Message( stdout, "ExtAcc 4 allocated properly \n", __FUNCTION__ );
-   }
 
-
-   if (ExtAcc_InitialField[5] == NULL) { 
      ExtAcc_InitialField[5] = (double*)calloc((dim+1)*dim*dim, sizeof(double));
-   } 
 
-   for( int i = 0; i < (dim+1)*dim*dim; i++){
+     for( int i = 0; i < (dim+1)*dim*dim; i++){
 
-     ExtAcc_InitialField[3][i] = mag_x[i];
-     ExtAcc_InitialField[4][i] = mag_y[i];
-     ExtAcc_InitialField[5][i] = mag_z[i];
-   }
+       ExtAcc_InitialField[3][i] = mag_x[i];
+       ExtAcc_InitialField[4][i] = mag_y[i];
+       ExtAcc_InitialField[5][i] = mag_z[i];
+     }  
 
-    free(mag_x);
-    free(mag_y);
-    free(mag_z);
+      free(mag_x);
+      free(mag_y);
+      free(mag_z);
 
+      Aux_Message(stdout, "Freed the fields \n" );
 
    // Unravel the indexing
 
-   int m_temp, ix, iy, iz;
+     int m_temp, ix, iy, iz;
    
-   ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * (dim+1));
-   iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * dim);
-   iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * dim);
-   m_temp = (iz + dim * (iy + dim * ix));
+     ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * (dim+1));
+     iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * dim);
+     iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * dim);
+     m_temp = (iz + dim * (iy + dim * ix));
    
 
-   magnetic[MAGX] = ExtAcc_InitialField[3][m_temp];
+     magnetic[MAGX] = ExtAcc_InitialField[3][m_temp];
+     Aux_Message(stdout, "Fed data into MAGX \n" );
    
-   ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * dim);
-   iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * (dim+1));
-   iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * dim);
-   m_temp = (iz + dim * (iy + dim * ix));
+     ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * dim);
+     iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * (dim+1));
+     iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * dim);
+     m_temp = (iz + dim * (iy + dim * ix));
    
-   magnetic[MAGY] = ExtAcc_InitialField[4][m_temp];
+     magnetic[MAGY] = ExtAcc_InitialField[4][m_temp];
+     Aux_Message(stdout, "Fed data into MAGY \n" );
    
-   ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * dim);
-   iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * dim);
-   iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * (dim+1));
-   m_temp = (iz + dim * (iy + dim * ix));
+     ix = (int) ((x - amr->BoxEdgeL[0])/(amr->BoxEdgeR[0] - amr->BoxEdgeL[0]) * dim);
+     iy = (int) ((y - amr->BoxEdgeL[1])/(amr->BoxEdgeR[1] - amr->BoxEdgeL[1]) * dim);
+     iz = (int) ((z - amr->BoxEdgeL[2])/(amr->BoxEdgeR[2] - amr->BoxEdgeL[2]) * (dim+1));
+     m_temp = (iz + dim * (iy + dim * ix));
 
-   magnetic[MAGZ] = ExtAcc_InitialField[5][m_temp];
+     magnetic[MAGZ] = ExtAcc_InitialField[5][m_temp];
+     Aux_Message(stdout, "Fed data into MAGZ \n" );
 
+   }
  } // FUNCTION : SetBFieldIC
 #endif // #ifdef MHD
 #endif // #if ( MODEL == HYDRO )
